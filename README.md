@@ -13,3 +13,8 @@ Install dependencies:
 ```bash 
 poetry install
 ```
+
+Start sever:
+```bash
+poetry run task start
+```
