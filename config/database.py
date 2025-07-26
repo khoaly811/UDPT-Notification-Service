@@ -1,20 +1,17 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
-import os
 from typing import Generator
+from .settings import settings
 
-# Database configuration
-DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://postgres:postgres@localhost:5432/postgres")
-
-# Create engine with connection pooling
+# Create engine with connection pooling using settings
 engine = create_engine(
-    DATABASE_URL,
-    pool_size=10,
-    max_overflow=20,
+    settings.database.url,
+    pool_size=settings.database.pool_size,
+    max_overflow=settings.database.max_overflow,
     pool_pre_ping=True,
-    pool_recycle=300,
-    echo=False  # Set to True for SQL debugging
+    pool_recycle=settings.database.pool_recycle,
+    echo=settings.database.echo
 )
 
 # Create SessionLocal class
@@ -60,6 +57,7 @@ def test_db_connection() -> bool:
         return True
     except Exception as e:
         print(f"Database connection failed: {e}")
+        print(f"Database URL: {settings.database.url}")
         return False
 
 # Initialize database tables
@@ -74,6 +72,12 @@ def init_db():
         # Create all tables
         Base.metadata.create_all(bind=engine)
         print("Database tables created successfully")
+
+        if settings.database.echo:
+            print(f"Database URL: {settings.database.url}")
+            print(f"Pool size: {settings.database.pool_size}")
+
     except Exception as e:
         print(f"Failed to create database tables: {e}")
+        print(f"Database URL: {settings.database.url}")
         raise

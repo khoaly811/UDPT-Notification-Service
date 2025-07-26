@@ -61,6 +61,13 @@ def get_settings() -> Settings:
     - DATABASE__URL=postgresql://user:pass@localhost/db
     - REDIS__HOST=redis-server
     """
+    # Load database URL with multiple fallbacks
+    database_url = (
+            os.getenv("DATABASE__URL") or
+            os.getenv("DATABASE_URL") or
+            "postgresql://postgres:postgres@localhost:5432/postgres"
+    )
+
     return Settings(
         app=AppConfig(
             debug=os.getenv("APP__DEBUG", "false").lower() == "true",
@@ -69,8 +76,10 @@ def get_settings() -> Settings:
             secret_key=os.getenv("APP__SECRET_KEY", "your-secret-key-here"),
         ),
         database=DatabaseConfig(
-            url=os.getenv("DATABASE__URL", "postgresql://postgres:postgres@localhost:5432/postgres"),
+            url=database_url,
             pool_size=int(os.getenv("DATABASE__POOL_SIZE", "10")),
+            max_overflow=int(os.getenv("DATABASE__MAX_OVERFLOW", "20")),
+            pool_recycle=int(os.getenv("DATABASE__POOL_RECYCLE", "300")),
             echo=os.getenv("DATABASE__ECHO", "false").lower() == "true",
         ),
         redis=RedisConfig(

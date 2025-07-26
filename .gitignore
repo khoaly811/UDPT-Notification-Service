@@ -55,10 +55,6 @@ instance/
 # Task runner logs (like taskipy or similar)
 taskipy.log
 
-# Environments / Secrets
-.env
-.env.*
-
 # VS Code / IDEs
 .vscode/
 .idea/
