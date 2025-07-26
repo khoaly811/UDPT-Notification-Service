@@ -9,8 +9,6 @@ authors = [
 ]
 readme = "README.md"
 
-
-
 requires-python = ">=3.11,<4.0"
 dependencies = [
     "fastapi (>=0.116.1,<0.117.0)",
@@ -20,11 +18,11 @@ dependencies = [
     "poetry-plugin-export (>=1.9.0,<2.0.0)"
 ]
 
-[tool.taskipy.tasks]
-start = "python src/main.py"
-
 [tool.poetry]
 package-mode = false
+
+[tool.taskipy.tasks]
+start = "python src/main.py"
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
