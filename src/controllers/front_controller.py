@@ -7,8 +7,6 @@ from config.settings import settings
 from config.database import test_db_connection, init_db
 from config.database_utils import (
     get_database_info,
-    check_tables_exist,
-    create_schema_if_not_exists,
     diagnose_database_issues
 )
 import logging
@@ -31,7 +29,6 @@ async def lifespan(app: FastAPI):
     try:
         if test_db_connection():
             logger.info("Database connection successful")
-            create_schema_if_not_exists()
             init_db()
             logger.info("Database tables initialized")
             db_info = get_database_info()
@@ -91,12 +88,10 @@ async def health_check():
     # Add detailed database info if available
     try:
         db_info = get_database_info()
-        table_info = check_tables_exist()
 
         health_data["database_details"] = {
             "driver": db_info.get("driver"),
             "pool_size": settings.database.pool_size,
-            "tables_exist": table_info.get("all_tables_exist", False),
             "schema": "admin"
         }
     except Exception as e:

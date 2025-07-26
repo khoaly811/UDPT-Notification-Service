@@ -1,9 +1,8 @@
 """
 Database utilities and helper functions
 """
-from sqlalchemy import text, inspect
-from sqlalchemy.exc import SQLAlchemyError
-from .database import engine, Base
+from sqlalchemy import text
+from .database import engine
 from .settings import settings
 import logging
 
@@ -39,77 +38,6 @@ def get_database_info() -> dict:
             "error": str(e),
             "status": "disconnected"
         }
-
-def check_tables_exist() -> dict:
-    """
-    Check if required tables exist in database
-
-    Returns:
-        Dict with table status
-    """
-    try:
-        inspector = inspect(engine)
-        existing_tables = inspector.get_table_names(schema="admin")
-
-        required_tables = ["user"]  # Add more tables as needed
-        table_status = {}
-
-        for table in required_tables:
-            table_status[table] = table in existing_tables
-
-        return {
-            "schema": "admin",
-            "required_tables": required_tables,
-            "existing_tables": existing_tables,
-            "table_status": table_status,
-            "all_tables_exist": all(table_status.values())
-        }
-    except Exception as e:
-        return {
-            "error": str(e),
-            "all_tables_exist": False
-        }
-
-def create_schema_if_not_exists():
-    """
-    Create admin schema if it doesn't exist
-    """
-    try:
-        with engine.connect() as connection:
-            # Check if schema exists
-            result = connection.execute(
-                text("SELECT schema_name FROM information_schema.schemata WHERE schema_name = 'admin'")
-            )
-
-            if not result.fetchone():
-                # Create schema
-                connection.execute(text("CREATE SCHEMA admin"))
-                connection.commit()
-                logger.info("Created admin schema")
-            else:
-                logger.info("Admin schema already exists")
-
-    except SQLAlchemyError as e:
-        logger.error(f"Failed to create admin schema: {e}")
-        raise
-
-def reset_database():
-    """
-    Drop and recreate all tables (USE WITH CAUTION!)
-    """
-    try:
-        logger.warning("Dropping all tables...")
-        Base.metadata.drop_all(bind=engine)
-
-        logger.info("Creating all tables...")
-        Base.metadata.create_all(bind=engine)
-
-        logger.info("Database reset completed")
-        return True
-
-    except Exception as e:
-        logger.error(f"Database reset failed: {e}")
-        return False
 
 def get_connection_pool_status() -> dict:
     """
@@ -156,9 +84,6 @@ def diagnose_database_issues() -> dict:
 
     # Get database info
     diagnosis["database_info"] = get_database_info()
-
-    # Check tables
-    diagnosis["table_check"] = check_tables_exist()
 
     # Pool status
     diagnosis["pool_status"] = get_connection_pool_status()
