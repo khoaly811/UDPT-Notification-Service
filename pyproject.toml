@@ -1,0 +1,31 @@
+[project]
+name = "udpt-hospital-management-system-be"
+version = "0.1.0"
+description = "Back end for udpt-hospital-management-system"
+authors = [
+    {name = "Toàn Từ",email = "toantu03@gmail.com"},
+    {name = "Khải Trần",email = "khaihckn@gmail.com"},
+    {name = "Khang Bùi",email = "chikhangbui@gmail.com"}
+]
+readme = "README.md"
+
+
+
+requires-python = ">=3.11,<4.0"
+dependencies = [
+    "fastapi (>=0.116.1,<0.117.0)",
+    "sqlalchemy (>=2.0.41,<3.0.0)",
+    "pydantic (>=2.11.7,<3.0.0)",
+    "taskipy (>=1.14.1,<2.0.0)",
+    "poetry-plugin-export (>=1.9.0,<2.0.0)"
+]
+
+[tool.taskipy.tasks]
+start = "python src/main.py"
+
+[tool.poetry]
+package-mode = false
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
