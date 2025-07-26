@@ -68,3 +68,4 @@ taskipy.log
 # Mac / Linux / Windows OS files
 .DS_Store
 Thumbs.db
+/resources/logs

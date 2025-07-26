@@ -14,7 +14,17 @@ Install dependencies:
 poetry install
 ```
 
+Initialize databases:
+```bash
+poetry run task up
+```
+
 Start sever:
 ```bash
 poetry run task start
+```
+
+Clean up databases:
+```bash
+poetry run task down
 ```
