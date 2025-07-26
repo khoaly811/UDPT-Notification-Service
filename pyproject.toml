@@ -15,7 +15,8 @@ dependencies = [
     "sqlalchemy (>=2.0.41,<3.0.0)",
     "pydantic (>=2.11.7,<3.0.0)",
     "taskipy (>=1.14.1,<2.0.0)",
-    "poetry-plugin-export (>=1.9.0,<2.0.0)"
+    "poetry-plugin-export (>=1.9.0,<2.0.0)",
+    "uvicorn (>=0.35.0,<0.36.0)"
 ]
 
 [tool.poetry]
