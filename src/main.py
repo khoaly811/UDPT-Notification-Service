@@ -1,4 +1,10 @@
 import uvicorn
+from config import settings
 
 if __name__ == "__main__":
-    uvicorn.run("controllers.front_controller:app", host="127.0.0.1", port=8000, reload=True)
+    uvicorn.run(
+        "src.controllers.front_controller:app",
+        host=settings.app.host,
+        port=settings.app.port,
+        reload=settings.app.reload
+    )
