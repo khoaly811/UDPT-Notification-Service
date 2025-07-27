@@ -134,7 +134,7 @@ class UserService:
             )
     @staticmethod
     def _hash_password(password: str) -> str:
-        """Hash password sử dụng SHA-256 (đơn giản cho demo)"""
+        """Hash password sử dụng SHA-256"""
         return hashlib.sha256(password.encode()).hexdigest()
 
     def validate_user_exists(self, user_id: int) -> User:
