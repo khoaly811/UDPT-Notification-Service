@@ -7,7 +7,7 @@ from src.dto.user_dto import (
     UserResponseDTO,
     UserDetailResponseDTO
 )
-from src.dto.pagination_dto import PaginatedResponseDTO
+from src.dto.pagination_dto import PaginatedResponseDTO, PaginationRequestDTO
 from fastapi import HTTPException, status
 import hashlib
 
@@ -15,23 +15,27 @@ class UserService:
     def __init__(self, db: Session):
         self.repository = UserRepository(db)
 
-    def get_users_list(self, page: int = 1, page_size: int = 10) -> PaginatedResponseDTO[UserResponseDTO]:
+    def get_users_list(self, pagination_request: PaginationRequestDTO) -> PaginatedResponseDTO[UserResponseDTO]:
         """Lấy danh sách người dùng với phân trang"""
-        self._validate_pagination(page, page_size)
-
-        skip = (page - 1) * page_size
+        skip = pagination_request.calc_skip()
 
         # Lấy danh sách users và tổng số
-        users = self.repository.get_all_users(skip=skip, limit=page_size)
+        users = self.repository.get_all_users(skip=skip, limit=pagination_request.page_size)
         total = self.repository.count_users()
+
+        if skip >= total:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Page number exceeds total number of pages"
+            )
 
         # Convert sang UserResponseDTO
         user_responses = [UserResponseDTO.model_validate(user) for user in users]
 
         return PaginatedResponseDTO.create(
             data=user_responses,
-            page=page,
-            page_size=page_size,
+            page=pagination_request.page,
+            page_size=pagination_request.page_size,
             total=total
         )
 
@@ -118,20 +122,6 @@ class UserService:
         user = self.validate_user_exists(user_id)
         return self.repository.delete_user(user)
 
-    @staticmethod
-    def _validate_pagination(page: int, page_size: int) -> None:
-        """Validate pagination parameters"""
-        if page < 1:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Page number must be greater than 0"
-            )
-
-        if page_size < 1 or page_size > 100:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Page size must be between 1 and 100"
-            )
     @staticmethod
     def _hash_password(password: str) -> str:
         """Hash password sử dụng SHA-256"""

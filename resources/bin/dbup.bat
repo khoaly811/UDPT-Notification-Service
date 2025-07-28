@@ -14,7 +14,7 @@ setlocal enabledelayedexpansion
 
 echo [STATUS]: Waiting to establish connections to all containers...
 set MAX_ATTEMPTS=40
-set INTERVAL=10
+set INTERVAL=5
 
 for /L %%i in (1,1,%MAX_ATTEMPTS%) do (
     set "all_ready=true"

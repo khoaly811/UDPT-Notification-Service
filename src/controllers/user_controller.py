@@ -8,7 +8,7 @@ from src.dto.user_dto import (
     UserDetailResponseDTO,
     MessageResponseDTO
 )
-from src.dto.pagination_dto import PaginatedResponseDTO
+from src.dto.pagination_dto import PaginatedResponseDTO, PaginationRequestDTO
 from config import get_db
 
 router = APIRouter(prefix="/users", tags=["users"])
@@ -38,7 +38,8 @@ async def get_users(
     Returns:
         PaginatedResponseDTO với danh sách users và metadata phân trang
     """
-    return service.get_users_list(page=page, page_size=page_size)
+    pagination_request = PaginationRequestDTO(page=page, page_size=page_size)
+    return service.get_users_list(pagination_request)
 
 @router.get(
     "/{user_id}",
