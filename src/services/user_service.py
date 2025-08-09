@@ -22,6 +22,11 @@ class UserService:
         # Lấy danh sách users và tổng số
         users = self.repository.get_all_users(skip=skip, limit=pagination_request.page_size)
         total = self.repository.count_users()
+        if total == 0:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Users not found."
+            )
 
         if skip >= total:
             raise HTTPException(
