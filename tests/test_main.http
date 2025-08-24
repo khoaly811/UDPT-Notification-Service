@@ -1,11 +1,25 @@
 # Test your FastAPI endpoints
 
-GET http://127.0.0.1:8000/
+GET http://127.0.0.1:8011/
 Accept: application/json
 
 ###
 
-GET http://127.0.0.1:8000/hello/User
+GET http://127.0.0.1:8011/hello/User
 Accept: application/json
 
 ###
+POST http://localhost:8011/prescriptions
+Accept: application/json
+
+{
+  "patient_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+  "doctor_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+  "encounter_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+  "items": [
+    {
+      "medication_id": "8c65a16f-ef81-46d6-8e6a-524a471bf9a4",
+      "notes": "toi la khoa"
+    }
+  ]
+}

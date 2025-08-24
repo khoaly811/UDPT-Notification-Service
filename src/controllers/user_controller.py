@@ -11,13 +11,13 @@ from src.dto.user_dto import (
 from src.dto.pagination_dto import PaginatedResponseDTO, PaginationRequestDTO
 from config import get_db
 
-router = APIRouter(prefix="/users", tags=["users"])
+user_router = APIRouter(prefix="/users", tags=["users"])
 
 def get_user_service(db: Session = Depends(get_db)) -> UserService:
     """Dependency để get UserService instance"""
     return UserService(db)
 
-@router.get(
+@user_router.get(
     "/",
     response_model=PaginatedResponseDTO[UserResponseDTO],
     status_code=status.HTTP_200_OK,
@@ -41,7 +41,7 @@ async def get_users(
     pagination_request = PaginationRequestDTO(page=page, page_size=page_size)
     return service.get_users_list(pagination_request)
 
-@router.get(
+@user_router.get(
     "/{user_id}",
     response_model=UserDetailResponseDTO,
     status_code=status.HTTP_200_OK,
@@ -62,7 +62,7 @@ async def get_user_by_id(
     """
     return service.get_user_by_id(user_id)
 
-@router.post(
+@user_router.post(
     "/",
     response_model=UserResponseDTO,
     status_code=status.HTTP_201_CREATED,
@@ -85,7 +85,7 @@ async def create_user(
     """
     return service.create_user(user_data)
 
-@router.put(
+@user_router.put(
     "/{user_id}",
     response_model=UserResponseDTO,
     status_code=status.HTTP_200_OK,
@@ -110,7 +110,7 @@ async def update_user(
     """
     return service.update_user(user_id, user_data)
 
-@router.delete(
+@user_router.delete(
     "/{user_id}",
     response_model=MessageResponseDTO,
     status_code=status.HTTP_200_OK,

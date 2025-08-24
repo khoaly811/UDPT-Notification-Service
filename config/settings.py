@@ -32,7 +32,7 @@ class AppConfig(BaseModel):
     version: str = Field(default="0.1.0")
     debug: bool = Field(default=False)
     host: str = Field(default="127.0.0.1")
-    port: int = Field(default=8000, ge=1, le=65535)
+    port: int = Field(default=8011, ge=1, le=65535)
     reload: bool = Field(default=True)
 
     # Security
@@ -72,7 +72,7 @@ def get_settings() -> Settings:
         app=AppConfig(
             debug=os.getenv("APP__DEBUG", "false").lower() == "true",
             host=os.getenv("APP__HOST", "127.0.0.1"),
-            port=int(os.getenv("APP__PORT", "8000")),
+            port=int(os.getenv("APP__PORT", "8011")),
             secret_key=os.getenv("APP__SECRET_KEY", "your-secret-key-here"),
         ),
         database=DatabaseConfig(
