@@ -31,7 +31,6 @@ class PrescriptionService:
             prescription_code=prescription.prescription_code,
             patient_id=prescription.patient_id,
             doctor_id=prescription.doctor_id,
-            encounter_id=prescription.encounter_id,
             status=prescription.status,
             valid_from=prescription.valid_from,
             valid_to=prescription.valid_to,
@@ -52,7 +51,6 @@ class PrescriptionService:
         prescription = Prescription(
             patient_id=data.patient_id,
             doctor_id=data.doctor_id,
-            encounter_id=data.encounter_id,
             valid_from=data.valid_from,
             valid_to=data.valid_to,
             notes=data.notes,

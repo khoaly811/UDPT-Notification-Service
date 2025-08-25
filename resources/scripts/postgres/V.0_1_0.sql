@@ -11,6 +11,7 @@ CREATE TABLE IF NOT EXISTS medication.medicine (
       form                  TEXT,                     -- dạng bào chế (viên, ống, sirô,...)
       strength              TEXT,                     -- hàm lượng (e.g., 500 mg)
       unit                  TEXT,                     -- đơn vị định lượng dùng chung nếu cần
+      stock                 NUMERIC(14,3) DEFAULT 0 NOT NULL,
       is_active             BOOLEAN NOT NULL DEFAULT TRUE,
       created_at            TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
       updated_at            TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
@@ -53,30 +54,30 @@ CREATE TABLE IF NOT EXISTS medication.prescription_item (
 );
 
 -- 5) Dispense (phiếu cấp phát)
--- CREATE TABLE IF NOT EXISTS medication.dispense (
---       dispense_id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
---       prescription_id       UUID NOT NULL REFERENCES medication.prescription(prescription_id),
---       status TEXT NOT NULL DEFAULT 'PENDING'
---            CHECK (status IN ('PENDING','COMPLETED','CANCELED')),
---       dispensed_at          TIMESTAMP,               -- thời điểm hoàn tất (COMPLETED)
---       dispensed_by          UUID,                      -- user dược sĩ
---       notes                 TEXT,
---       created_at            TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
---       created_by            UUID,
---       updated_at            TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
---       updated_by            UUID
--- );
+CREATE TABLE IF NOT EXISTS medication.dispense (
+      dispense_id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      prescription_id       UUID NOT NULL REFERENCES medication.prescription(prescription_id),
+      status TEXT NOT NULL DEFAULT 'PENDING'
+           CHECK (status IN ('PENDING','COMPLETED')),
+      dispensed_at          TIMESTAMP,               -- thời điểm hoàn tất (COMPLETED)
+      dispensed_by          UUID,                      -- user dược sĩ
+      notes                 TEXT,
+      created_at            TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+      created_by            UUID,
+      updated_at            TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+      updated_by            UUID
+);
 
--- CREATE TABLE IF NOT EXISTS medication.dispense_line (
---       line_id               UUID PRIMARY KEY DEFAULT gen_random_uuid(),
---       dispense_id           UUID NOT NULL REFERENCES medication.dispense(dispense_id),
---       prescription_item_id  UUID NOT NULL REFERENCES medication.prescription_item(item_id),
---       quantity_dispensed    NUMERIC(14,3) NOT NULL CHECK (quantity_dispensed > 0),
---       lot_number            TEXT,                       -- số lô (nếu quản lý)
---       expiry_date           TIMESTAMP,
---       notes                 TEXT,
---       created_at            TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
--- );
+CREATE TABLE IF NOT EXISTS medication.dispense_line (
+      line_id               UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      dispense_id           UUID NOT NULL REFERENCES medication.dispense(dispense_id),
+      prescription_item_id  UUID NOT NULL REFERENCES medication.prescription_item(item_id),
+      quantity_dispensed    NUMERIC(14,3) NOT NULL CHECK (quantity_dispensed > 0),
+      lot_number            TEXT,                       -- số lô (nếu quản lý)
+      expiry_date           TIMESTAMP,
+      notes                 TEXT,
+      created_at            TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
 INSERT INTO medication.medicine (medication_id, atc_code, medicine_name, generic_name, form, strength, unit)
 VALUES
     (gen_random_uuid(), 'A01', 'Paracetamol 500mg', 'Paracetamol', 'Tablet', '500 mg', 'mg'),

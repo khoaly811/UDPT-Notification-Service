@@ -14,7 +14,6 @@ class Prescription(Base):
 
     patient_id = Column(UUID(as_uuid=True), nullable=False)
     doctor_id = Column(UUID(as_uuid=True), nullable=False)
-    encounter_id = Column(UUID(as_uuid=True), nullable=True)
 
     status = Column(Text, nullable=False, default="CREATED")
 

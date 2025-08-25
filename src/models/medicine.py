@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, Boolean, Text, DateTime, ForeignKey
+from sqlalchemy import Column, String, Boolean, Text, DateTime, ForeignKey, Numeric
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.sql import func
 from config import Base
@@ -17,6 +17,7 @@ class Medicine(Base):
     form = Column(Text, nullable=True)                # dạng bào chế
     strength = Column(Text, nullable=True)            # hàm lượng
     unit = Column(Text, nullable=True)                # đơn vị
+    stock = Column(Numeric(14, 3), nullable=False, default="0")
     is_active = Column(Boolean, nullable=False, server_default="true")
 
     created_at = Column(DateTime, nullable=False, server_default=func.now())

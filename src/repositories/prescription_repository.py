@@ -110,3 +110,7 @@ class PrescriptionRepository:
         except SQLAlchemyError:
             self.db.rollback()
             raise
+
+    def count_prescriptions(self) -> int:
+        """Đếm tổng số Prescription"""
+        return self.db.query(func.count(Prescription.prescription_id)).scalar() or 0

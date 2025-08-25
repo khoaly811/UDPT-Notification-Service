@@ -17,7 +17,6 @@ class PrescriptionItemCreateDTO(BaseModel):
 class PrescriptionCreateDTO(BaseModel):
     patient_id: UUID
     doctor_id: UUID
-    encounter_id: Optional[UUID] = None
     valid_from: datetime
     valid_to: Optional[datetime] = None
     notes: Optional[str] = None
@@ -65,7 +64,6 @@ class PrescriptionResponseDTO(BaseModel):
     prescription_code: Optional[str]
     patient_id: UUID
     doctor_id: UUID
-    encounter_id: Optional[UUID]
     status: str                        # <-- thêm trường này
     valid_from: datetime
     valid_to: Optional[datetime]
@@ -82,7 +80,6 @@ class PrescriptionListItemDTO(BaseModel):
     prescription_code: Optional[str]
     patient_id: UUID
     doctor_id: UUID
-    encounter_id: Optional[UUID]
     status: str
     valid_from: datetime
     valid_to: Optional[datetime]
