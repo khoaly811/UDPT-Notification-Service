@@ -112,6 +112,16 @@ class DispenseRepository:
             med.stock = Decimal(med.stock or 0) - need_qty
             self.db.add(med)
 
+    def get_medicine(self, medication_id: UUID) -> Optional[Medicine]:
+        """
+        Lấy thông tin thuốc theo medication_id
+        """
+        return (
+            self.db.query(Medicine)
+            .filter(Medicine.medication_id == medication_id)
+            .first()
+        )
+
     def sum_completed_dispensed_for_item(self, prescription_item_id: UUID) -> Decimal:
         """
         Tổng số lượng đã phát (chỉ tính các phiếu COMPLETED) cho 1 prescription_item.

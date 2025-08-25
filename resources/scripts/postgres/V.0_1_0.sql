@@ -78,7 +78,7 @@ CREATE TABLE IF NOT EXISTS medication.dispense_line (
       notes                 TEXT,
       created_at            TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
-INSERT INTO medication.medicine (medication_id, atc_code, medicine_name, generic_name, form, strength, unit)
+INSERT INTO medication.medicine (medication_id, atc_code, medicine_name, generic_name, form, strength, unit,stock)
 VALUES
-    (gen_random_uuid(), 'A01', 'Paracetamol 500mg', 'Paracetamol', 'Tablet', '500 mg', 'mg'),
-    (gen_random_uuid(), 'A02', 'Amoxicillin 250mg', 'Amoxicillin', 'Capsule', '250 mg', 'mg');
+    (gen_random_uuid(), 'A01', 'Paracetamol 500mg', 'Paracetamol', 'Tablet', '500 mg', 'mg',100),
+    (gen_random_uuid(), 'A02', 'Amoxicillin 250mg', 'Amoxicillin', 'Capsule', '250 mg', 'mg',100);
