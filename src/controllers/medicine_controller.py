@@ -12,39 +12,43 @@ from src.dto.medicine_dto import (
 )
 from config import get_db
 
-medicine_router = APIRouter(prefix="/medicines", tags=["medicines"])
+medicine_router = APIRouter(
+    prefix="/medicines",
+    tags=["Medicines"]
+)
 
 
+# ---------------- Dependency ----------------
 def get_medicine_service(db: Session = Depends(get_db)) -> MedicineService:
-    """Dependency để get MedicineService"""
+    """Provide MedicineService with active DB session"""
     return MedicineService(db)
 
 
 # ---------------- CREATE ----------------
 @medicine_router.post(
-    "/",
+    "",
     response_model=MedicineResponseDTO,
     status_code=status.HTTP_201_CREATED,
     summary="Create new medicine",
-    description="Create a new medicine record"
+    description="Create a new medicine record in the system"
 )
 async def create_medicine(
-    data: MedicineCreateDTO,
+    payload: MedicineCreateDTO,
     service: MedicineService = Depends(get_medicine_service)
 ):
-    return service.create_medicine(data)
+    return service.create_medicine(payload)
 
 
-# ---------------- DETAIL ----------------
+# ---------------- GET DETAIL ----------------
 @medicine_router.get(
     "/{medicine_id}",
     response_model=MedicineResponseDTO,
     status_code=status.HTTP_200_OK,
     summary="Get medicine by ID",
-    description="Retrieve detailed information of a specific medicine"
+    description="Retrieve detailed information of a specific medicine by its UUID"
 )
 async def get_medicine_by_id(
-    medicine_id: UUID = Path(..., description="Medicine ID"),
+    medicine_id: UUID = Path(..., description="Medicine unique ID"),
     service: MedicineService = Depends(get_medicine_service)
 ):
     return service.get_medicine_by_id(medicine_id)
@@ -52,15 +56,15 @@ async def get_medicine_by_id(
 
 # ---------------- LIST + PAGINATION ----------------
 @medicine_router.get(
-    "/",
+    "",
     response_model=PaginatedResponseDTO[MedicineListItemDTO],
     status_code=status.HTTP_200_OK,
     summary="List medicines (paginated)",
-    description="List medicines with pagination"
+    description="Retrieve a paginated list of medicines"
 )
 async def list_medicines(
-    page: int = Query(1, ge=1),
-    page_size: int = Query(10, ge=1, le=100),
+    page: int = Query(1, ge=1, description="Page number, starts from 1"),
+    page_size: int = Query(10, ge=1, le=100, description="Number of items per page"),
     service: MedicineService = Depends(get_medicine_service)
 ):
     pagination = PaginationRequestDTO(page=page, page_size=page_size)
@@ -72,14 +76,15 @@ async def list_medicines(
     "/{medicine_id}",
     response_model=MedicineResponseDTO,
     status_code=status.HTTP_200_OK,
-    summary="Update a medicine"
+    summary="Update medicine details",
+    description="Update selected fields of a medicine by its UUID"
 )
 async def update_medicine(
-    medicine_id: UUID,
-    data: MedicineUpdateDTO,
+    medicine_id: UUID = Path(..., description="Medicine unique ID"),
+    payload: MedicineUpdateDTO = ...,
     service: MedicineService = Depends(get_medicine_service)
 ):
-    return service.update_medicine(medicine_id, data)
+    return service.update_medicine(medicine_id, payload)
 
 
 # ---------------- DELETE / DEACTIVATE ----------------
@@ -87,10 +92,11 @@ async def update_medicine(
     "/{medicine_id}",
     response_model=MedicineResponseDTO,
     status_code=status.HTTP_200_OK,
-    summary="Delete (deactivate) a medicine"
+    summary="Deactivate medicine",
+    description="Soft-delete (deactivate) a medicine by setting `is_active = False`"
 )
 async def delete_medicine(
-    medicine_id: UUID,
+    medicine_id: UUID = Path(..., description="Medicine unique ID"),
     service: MedicineService = Depends(get_medicine_service)
 ):
     return service.delete_medicine(medicine_id)

@@ -32,6 +32,7 @@ class MedicineService:
             unit=data.unit,
             stock=data.stock,
             is_active=True,
+            expiry_date=data.expiry_date
         )
         created = self.repository.create_medicine(medicine)
         return self._to_response(created)

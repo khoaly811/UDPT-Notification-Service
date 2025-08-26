@@ -2,6 +2,8 @@ from pydantic import BaseModel, Field
 from uuid import UUID
 from typing import Optional
 from datetime import datetime
+from decimal import Decimal
+
 
 # ---------------- CREATE DTO ----------------
 class MedicineCreateDTO(BaseModel):
@@ -11,7 +13,8 @@ class MedicineCreateDTO(BaseModel):
     form: Optional[str] = Field(None, description="Dosage form (tablet, capsule, syrup,...)")
     strength: Optional[str] = Field(None, description="Strength (e.g., 500 mg)")
     unit: Optional[str] = Field(None, description="Common measurement unit (e.g., mg, ml)")
-    stock: float = Field(0, ge=0, description="Available stock")
+    stock: Decimal = Field(0, ge=0, description="Available stock")
+    expiry_date: Optional[datetime] = Field(None, description="Expiry date of the medicine")
 
 
 # ---------------- UPDATE DTO ----------------
@@ -22,8 +25,9 @@ class MedicineUpdateDTO(BaseModel):
     form: Optional[str] = None
     strength: Optional[str] = None
     unit: Optional[str] = None
-    stock: Optional[float] = Field(None, ge=0)
+    stock: Optional[Decimal] = Field(None, ge=0)
     is_active: Optional[bool] = None
+    expiry_date: Optional[datetime] = None
 
 
 # ---------------- LIST ITEM DTO ----------------
@@ -34,9 +38,9 @@ class MedicineListItemDTO(BaseModel):
     form: Optional[str]
     strength: Optional[str]
     unit: Optional[str]
-    stock: float
+    stock: Decimal
     is_active: bool
-
+    expiry_date: datetime
     class Config:
         from_attributes = True  # cho SQLAlchemy ORM
 
@@ -50,8 +54,9 @@ class MedicineResponseDTO(BaseModel):
     form: Optional[str]
     strength: Optional[str]
     unit: Optional[str]
-    stock: float
+    stock: Decimal
     is_active: bool
+    expiry_date: datetime
     created_at: datetime
     updated_at: datetime
 
