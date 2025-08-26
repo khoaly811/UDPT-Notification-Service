@@ -40,8 +40,6 @@ class DispenseLine(Base):
                                   nullable=False)
 
     quantity_dispensed = Column(Numeric(14, 3), nullable=False)
-    lot_number = Column(Text, nullable=True)
-    expiry_date = Column(DateTime, nullable=True)
     notes = Column(Text, nullable=True)
 
     created_at = Column(DateTime, nullable=False, server_default=func.now())

@@ -19,7 +19,7 @@ class Medicine(Base):
     unit = Column(Text, nullable=True)                # đơn vị
     stock = Column(Numeric(14, 3), nullable=False, default="0")
     is_active = Column(Boolean, nullable=False, server_default="true")
-
+    expiry_date = Column(DateTime, nullable=False, server_default=func.now())
     created_at = Column(DateTime, nullable=False, server_default=func.now())
     updated_at = Column(DateTime, nullable=False, server_default=func.now(), onupdate=func.now())
 

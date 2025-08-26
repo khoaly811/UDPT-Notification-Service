@@ -12,6 +12,7 @@ CREATE TABLE IF NOT EXISTS medication.medicine (
       strength              TEXT,                     -- hàm lượng (e.g., 500 mg)
       unit                  TEXT,                     -- đơn vị định lượng dùng chung nếu cần
       stock                 NUMERIC(14,3) DEFAULT 0 NOT NULL,
+      expiry_date           TIMESTAMP,
       is_active             BOOLEAN NOT NULL DEFAULT TRUE,
       created_at            TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
       updated_at            TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
@@ -24,7 +25,7 @@ CREATE TABLE IF NOT EXISTS medication.prescription (
       doctor_id         UUID NOT NULL,              -- bác sĩ kê (logic ID)
       encounter_id          UUID,                       -- lần khám (logic ID)
       status TEXT NOT NULL DEFAULT 'CREATED'
-           CHECK (status IN ('CREATED','UPDATED','CANCELED','DISPENSED')),
+           CHECK (status IN ('CREATED','UPDATED','CANCELED','PARTIALLY_DISPENSED','DISPENSED')),
       valid_from            TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL ,
       valid_to              TIMESTAMP,                       -- hạn dùng đơn
       notes                 TEXT,
@@ -73,12 +74,10 @@ CREATE TABLE IF NOT EXISTS medication.dispense_line (
       dispense_id           UUID NOT NULL REFERENCES medication.dispense(dispense_id),
       prescription_item_id  UUID NOT NULL REFERENCES medication.prescription_item(item_id),
       quantity_dispensed    NUMERIC(14,3) NOT NULL CHECK (quantity_dispensed > 0),
-      lot_number            TEXT,                       -- số lô (nếu quản lý)
-      expiry_date           TIMESTAMP,
       notes                 TEXT,
       created_at            TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
-INSERT INTO medication.medicine (medication_id, atc_code, medicine_name, generic_name, form, strength, unit,stock)
+INSERT INTO medication.medicine (medication_id, atc_code, medicine_name, generic_name, form, strength, unit,stock, expiry_date)
 VALUES
-    (gen_random_uuid(), 'A01', 'Paracetamol 500mg', 'Paracetamol', 'Tablet', '500 mg', 'mg',100),
-    (gen_random_uuid(), 'A02', 'Amoxicillin 250mg', 'Amoxicillin', 'Capsule', '250 mg', 'mg',100);
+    (gen_random_uuid(), 'A01', 'Paracetamol 500mg', 'Paracetamol', 'Tablet', '500 mg', 'mg',100,'2025-12-31T23:59:59'),
+    (gen_random_uuid(), 'A02', 'Amoxicillin 250mg', 'Amoxicillin', 'Capsule', '250 mg', 'mg',100,'2025-12-31T23:59:59');

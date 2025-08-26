@@ -12,8 +12,6 @@ class DispenseCreateDTO(BaseModel):
 class DispenseLineCreateDTO(BaseModel):
     prescription_item_id: UUID
     quantity_dispensed: Decimal
-    lot_number: Optional[str] = None
-    expiry_date: Optional[datetime] = None
     notes: Optional[str] = None
 
 class DispenseCompleteDTO(BaseModel):
@@ -23,8 +21,6 @@ class DispenseLineResponseDTO(BaseModel):
     line_id: UUID
     prescription_item_id: UUID
     quantity_dispensed: Decimal
-    lot_number: Optional[str]
-    expiry_date: Optional[datetime]
     notes: Optional[str]
     created_at: datetime
     class Config:

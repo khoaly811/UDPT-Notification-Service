@@ -74,8 +74,6 @@ class DispenseService:
             dispense_id=dispense.dispense_id,
             prescription_item_id=pi.item_id,
             quantity_dispensed=dto.quantity_dispensed,
-            lot_number=dto.lot_number,
-            expiry_date=dto.expiry_date,
             notes=dto.notes
         )
         self.repo.add_line(line)
@@ -107,9 +105,11 @@ class DispenseService:
         completed = self.repo.complete_dispense(dispense, dto.dispensed_by)
 
         # ❸ Nếu đơn đã phát đủ hết -> set prescription = DISPENSED
-        if self._is_prescription_fully_dispensed(dispense.prescription_id):
-            pres = self.repo.get_prescription(dispense.prescription_id)
+        pres = self.repo.get_prescription(dispense.prescription_id)
+        if self._is_prescription_fully_dispensed(pres.prescription_id):
             self.repo.set_prescription_status(pres, "DISPENSED")
+        elif self._is_prescription_completed(pres.prescription_id):
+            self.repo.set_prescription_status(pres, "PARTIALLY_DISPENSED")
 
         # ❹ Commit một lần để đảm bảo tất cả thay đổi (trừ kho + completed + status đơn)
         self.repo.commit()
@@ -136,6 +136,21 @@ class DispenseService:
             if Decimal(completed_qty) < Decimal(it.quantity_prescribed):
                 return False
         return True
+
+    def _is_prescription_partially_dispensed(self, prescription_id: UUID) -> bool:
+        items=self.repo.get_prescription_items(prescription_id)
+        if not items:
+            return False
+        any_dispensed = False
+        all_fully = True
+        for it in items:
+            completed_qty = self.repo.sum_completed_dispensed_for_item(it.item_id)
+            if Decimal(completed_qty) > 0:
+                any_dispensed = True
+            if Decimal(completed_qty) < Decimal(it.quantity_prescribed):
+                all_fully = False
+
+        return any_dispensed and not all_fully
 
     def _to_dispense_response(self, dispense: Dispense, lines: List[DispenseLine]) -> DispenseResponseDTO:
         line_dtos = [DispenseLineResponseDTO.model_validate(l) for l in lines]
