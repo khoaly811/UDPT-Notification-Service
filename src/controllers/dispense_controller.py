@@ -45,3 +45,35 @@ async def complete_dispense(dispense_id: UUID, dto: DispenseCompleteDTO, service
 )
 async def get_dispense(dispense_id: UUID, service: DispenseService = Depends(get_service)):
     return service.get_dispense(dispense_id)
+# @dispense_router.post(
+#     "/by-prescription/{prescription_id}/lines",
+#     response_model=DispenseResponseDTO,
+#     status_code=status.HTTP_200_OK,
+#     summary="Add a line for a prescription (auto use/create a PENDING dispense)"
+# )
+# async def add_line_by_prescription(
+#     prescription_id: UUID,
+#     dto: DispenseLineCreateDTO,
+#     service: DispenseService = Depends(get_service)
+# ):
+#     """
+#     Nếu đã có phiếu PENDING cho prescription -> dùng tiếp.
+#     Nếu chưa có -> tự tạo phiếu PENDING mới rồi thêm line.
+#     """
+#     return service.add_line_by_prescription(prescription_id, dto)
+#
+# @dispense_router.post(
+#     "/by-prescription/{prescription_id}/complete",
+#     response_model=DispenseResponseDTO,
+#     status_code=status.HTTP_200_OK,
+#     summary="Complete the latest PENDING dispense for a prescription"
+# )
+# async def complete_pending_by_prescription(
+#     prescription_id: UUID,
+#     dto: DispenseCompleteDTO,
+#     service: DispenseService = Depends(get_service)
+# ):
+#     """
+#     Tìm phiếu PENDING mới nhất của prescription và complete nó.
+#     """
+#     return service.complete_pending_by_prescription(prescription_id, dto)

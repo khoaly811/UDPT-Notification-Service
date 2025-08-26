@@ -15,32 +15,6 @@ class DispenseRepository:
     def __init__(self, db: Session):
         self.db = db
 
-    # -------- Prescription helpers --------
-    def get_prescription(self, prescription_id: UUID) -> Optional[Prescription]:
-        return (
-            self.db.query(Prescription)
-            .filter(Prescription.prescription_id == prescription_id)
-            .first()
-        )
-
-    def get_prescription_item(self, item_id: UUID) -> Optional[PrescriptionItem]:
-        return (
-            self.db.query(PrescriptionItem)
-            .filter(PrescriptionItem.item_id == item_id)
-            .first()
-        )
-
-    def get_prescription_items(self, prescription_id: UUID) -> List[PrescriptionItem]:
-        return (
-            self.db.query(PrescriptionItem)
-            .filter(PrescriptionItem.prescription_id == prescription_id)
-            .all()
-        )
-
-    def set_prescription_status(self, prescription: Prescription, status_value: str) -> None:
-        prescription.status = status_value
-        self.db.add(prescription)
-
     # -------- Dispense --------
     def create_dispense(self, entity: Dispense) -> Dispense:
         self.db.add(entity)
@@ -112,6 +86,26 @@ class DispenseRepository:
             med.stock = Decimal(med.stock or 0) - need_qty
             self.db.add(med)
 
+    def get_pending_dispense_by_prescription(self, prescription_id: UUID) -> Optional[Dispense]:
+        return (
+            self.db.query(Dispense)
+            .filter(
+                Dispense.prescription_id == prescription_id,
+                Dispense.status == "PENDING"
+            )
+            .order_by(Dispense.created_at.desc())
+            .first()
+        )
+
+    def create_or_get_pending_dispense(self, prescription_id: UUID, notes: Optional[str] = None) -> Dispense:
+        existing = self.get_pending_dispense_by_prescription(prescription_id)
+        if existing:
+            return existing
+        entity = Dispense(prescription_id=prescription_id, notes=notes)
+        self.db.add(entity)
+        self.db.commit()
+        self.db.refresh(entity)
+        return entity
     def get_medicine(self, medication_id: UUID) -> Optional[Medicine]:
         """
         Lấy thông tin thuốc theo medication_id

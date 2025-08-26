@@ -14,6 +14,31 @@ class PrescriptionRepository:
         self.db = db
 
     # -------- Prescription --------
+    # -------- Prescription helpers --------
+    def get_prescription(self, prescription_id: UUID) -> Optional[Prescription]:
+        return (
+            self.db.query(Prescription)
+            .filter(Prescription.prescription_id == prescription_id)
+            .first()
+        )
+
+    def get_prescription_item(self, item_id: UUID) -> Optional[PrescriptionItem]:
+        return (
+            self.db.query(PrescriptionItem)
+            .filter(PrescriptionItem.item_id == item_id)
+            .first()
+        )
+
+    def get_prescription_items(self, prescription_id: UUID) -> List[PrescriptionItem]:
+        return (
+            self.db.query(PrescriptionItem)
+            .filter(PrescriptionItem.prescription_id == prescription_id)
+            .all()
+        )
+
+    def set_prescription_status(self, prescription: Prescription, status_value: str) -> None:
+        prescription.status = status_value
+        self.db.add(prescription)
 
     def get_all_prescriptions(self, skip: int, limit: int) -> List[Prescription]:
         """Lấy danh sách Prescription với phân trang"""

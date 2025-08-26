@@ -21,7 +21,7 @@ class DispenseService:
 
     # 1) Tạo phiếu cấp phát (PENDING)
     def create_dispense(self, dto: DispenseCreateDTO) -> DispenseResponseDTO:
-        pres = self.repo.get_prescription(dto.prescription_id)
+        pres = self.prescription_repo.get_prescription(dto.prescription_id)
         if not pres:
             raise HTTPException(status_code=404, detail="Prescription not found")
         if pres.status == "DISPENSED":
@@ -44,7 +44,7 @@ class DispenseService:
             raise HTTPException(status_code=400, detail="Only PENDING dispense can accept lines")
 
         # Kiểm tra prescription item hợp lệ & thuộc cùng prescription
-        pi = self.repo.get_prescription_item(dto.prescription_item_id)
+        pi = self.prescription_repo.get_prescription_item(dto.prescription_item_id)
         if not pi:
             raise HTTPException(status_code=404, detail="Prescription item not found")
         if pi.prescription_id != dispense.prescription_id:
@@ -82,6 +82,52 @@ class DispenseService:
         lines = self.repo.get_lines_by_dispense(dispense.dispense_id)
         return self._to_dispense_response(dispense, lines)
 
+    # def add_line_by_prescription(self, prescription_id: UUID, dto: DispenseLineCreateDTO) -> DispenseResponseDTO:
+    #     # 1) đảm bảo prescription tồn tại & hợp lệ
+    #     pres = self.prescription_repo.get_prescription(prescription_id)
+    #     if not pres:
+    #         raise HTTPException(status_code=404, detail="Prescription not found")
+    #     if pres.status == "CANCELED":
+    #         raise HTTPException(status_code=400, detail="Cannot add line for a canceled prescription")
+    #
+    #     # 2) lấy hoặc tạo phiếu PENDING
+    #     dispense = self.repo.create_or_get_pending_dispense(prescription_id)
+    #
+    #     # 3) dùng lại toàn bộ validate của add_line (Option A – chặn vượt số kê + cảnh báo stock)
+    #     # copy nguyên phần thân validate từ add_line(...) hiện có:
+    #     pi = self.prescription_repo.get_prescription_item(dto.prescription_item_id)
+    #     if not pi:
+    #         raise HTTPException(status_code=404, detail="Prescription item not found")
+    #     if pi.prescription_id != dispense.prescription_id:
+    #         raise HTTPException(status_code=400, detail="Prescription item does not belong to this prescription")
+    #     if dto.quantity_dispensed <= 0:
+    #         raise HTTPException(status_code=400, detail="quantity_dispensed must be > 0")
+    #
+    #     already_completed = self.repo.sum_completed_dispensed_for_item(pi.item_id)
+    #     already_in_this = self.repo.sum_lines_in_dispense_for_item(dispense.dispense_id, pi.item_id)
+    #     total_after = Decimal(already_completed) + Decimal(already_in_this) + Decimal(dto.quantity_dispensed)
+    #     if total_after > pi.quantity_prescribed:
+    #         raise HTTPException(
+    #             status_code=400,
+    #             detail=f"Dispensed total ({total_after}) exceeds prescribed ({pi.quantity_prescribed}) for this item"
+    #         )
+    #
+    #     med = self.repo.get_medicine(pi.medication_id)
+    #     if med and med.stock is not None and Decimal(med.stock) < Decimal(dto.quantity_dispensed):
+    #         raise HTTPException(status_code=400, detail="Insufficient stock for this medicine at the moment")
+    #
+    #     line = DispenseLine(
+    #         dispense_id=dispense.dispense_id,
+    #         prescription_item_id=pi.item_id,
+    #         quantity_dispensed=dto.quantity_dispensed,
+    #         lot_number=dto.lot_number,
+    #         expiry_date=dto.expiry_date,
+    #         notes=dto.notes
+    #     )
+    #     self.repo.add_line(line)
+    #
+    #     lines = self.repo.get_lines_by_dispense(dispense.dispense_id)
+    #     return self._to_dispense_response(dispense, lines)
     # 3) Hoàn tất phiếu (COMPLETED) và cập nhật prescription nếu đã phát đủ
     def complete(self, dispense_id: UUID, dto: DispenseCompleteDTO) -> DispenseResponseDTO:
         dispense = self.repo.get_dispense(dispense_id)
@@ -105,11 +151,11 @@ class DispenseService:
         completed = self.repo.complete_dispense(dispense, dto.dispensed_by)
 
         # ❸ Nếu đơn đã phát đủ hết -> set prescription = DISPENSED
-        pres = self.repo.get_prescription(dispense.prescription_id)
+        pres = self.prescription_repo.get_prescription(dispense.prescription_id)
         if self._is_prescription_fully_dispensed(pres.prescription_id):
-            self.repo.set_prescription_status(pres, "DISPENSED")
-        elif self._is_prescription_completed(pres.prescription_id):
-            self.repo.set_prescription_status(pres, "PARTIALLY_DISPENSED")
+            self.prescription_repo.set_prescription_status(pres, "DISPENSED")
+        elif self._is_prescription_partially_dispensed(pres.prescription_id):
+            self.prescription_repo.set_prescription_status(pres, "PARTIALLY_DISPENSED")
 
         # ❹ Commit một lần để đảm bảo tất cả thay đổi (trừ kho + completed + status đơn)
         self.repo.commit()
@@ -126,9 +172,19 @@ class DispenseService:
         lines = self.repo.get_lines_by_dispense(dispense.dispense_id)
         return self._to_dispense_response(dispense, lines)
 
+    # def complete_pending_by_prescription(self, prescription_id: UUID, dto: DispenseCompleteDTO) -> DispenseResponseDTO:
+    #     pres = self.prescription_repo.get_prescription(prescription_id)
+    #     if not pres:
+    #         raise HTTPException(status_code=404, detail="Prescription not found")
+    #
+    #     dispense = self.repo.get_pending_dispense_by_prescription(prescription_id)
+    #     if not dispense:
+    #         raise HTTPException(status_code=400, detail="No PENDING dispense for this prescription")
+    #
+    #     return self.complete(dispense.dispense_id, dto)
     # ---- Helpers ----
     def _is_prescription_fully_dispensed(self, prescription_id: UUID) -> bool:
-        items = self.repo.get_prescription_items(prescription_id)
+        items = self.prescription_repo.get_prescription_items(prescription_id)
         if not items:
             return False
         for it in items:
@@ -138,7 +194,7 @@ class DispenseService:
         return True
 
     def _is_prescription_partially_dispensed(self, prescription_id: UUID) -> bool:
-        items=self.repo.get_prescription_items(prescription_id)
+        items=self.prescription_repo.get_prescription_items(prescription_id)
         if not items:
             return False
         any_dispensed = False
