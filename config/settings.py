@@ -1,5 +1,7 @@
 import os
 from typing import Optional
+
+from dotenv import load_dotenv
 from pydantic import BaseModel, Field
 
 class DatabaseConfig(BaseModel):
@@ -63,6 +65,7 @@ class Settings(BaseModel):
 
 # Load settings from environment
 def get_settings() -> Settings:
+    load_dotenv("./.env")
     """
     Get application settings with environment variable overrides
 
