@@ -40,13 +40,23 @@ class AppConfig(BaseModel):
     algorithm: str = Field(default="HS256")
     access_token_expire_minutes: int = Field(default=30, ge=1)
 
+class RabbitMQConfig(BaseModel):
+    """RabbitMQ configuration settings"""
+    host: str = Field(default="rabbitmq")
+    port: int = Field(default=5672, ge=1, le=65535)
+    user: str = Field(default="guest")
+    password: str = Field(default="guest")
+    exchange: str = Field(default="prescription_exchange")
+    queue: str = Field(default="prescription_notifications")
+    routing_key: str = Field(default="prescription.ready")
+
 class Settings(BaseModel):
     """Main settings class"""
     app: AppConfig = AppConfig()
     database: DatabaseConfig = DatabaseConfig()
     redis: RedisConfig = RedisConfig()
     mongo: MongoConfig = MongoConfig()
-
+    rabbitmq: RabbitMQConfig = RabbitMQConfig()
     class Config:
         env_file = ".env"
         env_nested_delimiter = "__"
@@ -93,6 +103,15 @@ def get_settings() -> Settings:
             database=os.getenv("MONGO__DATABASE", "hospital-management"),
             username=os.getenv("MONGO__USERNAME"),
             password=os.getenv("MONGO__PASSWORD"),
+        ),
+        rabbitmq=RabbitMQConfig(
+            host=os.getenv("RABBITMQ__HOST", "rabbitmq"),
+            port=int(os.getenv("RABBITMQ__PORT", "5672")),
+            user=os.getenv("RABBITMQ__USER", "guest"),
+            password=os.getenv("RABBITMQ__PASSWORD", "guest"),
+            exchange=os.getenv("RABBITMQ__EXCHANGE", "prescription_exchange"),
+            queue=os.getenv("RABBITMQ__QUEUE", "prescription_notifications"),
+            routing_key=os.getenv("RABBITMQ__ROUTING_KEY", "prescription.ready"),
         )
     )
 

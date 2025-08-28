@@ -59,6 +59,16 @@ services:
       timeout: 10s
       retries: 3
       start_period: 10s
-
+  rabbitmq:
+      image: rabbitmq:3-management
+      container_name: rabbitmq
+      ports:
+        - "5672:5672"   # cổng AMQP
+        - "15672:15672" # cổng giao diện web quản lý
+      environment:
+        RABBITMQ_DEFAULT_USER: admin
+        RABBITMQ_DEFAULT_PASS: khoa123
+      networks:
+        - default
 
 

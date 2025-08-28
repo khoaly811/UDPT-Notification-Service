@@ -12,7 +12,7 @@ from src.dto.dispense_dto import (
     DispenseCreateDTO, DispenseLineCreateDTO, DispenseCompleteDTO,
     DispenseResponseDTO, DispenseLineResponseDTO
 )
-from src.dto.prescription_dto import PrescriptionResponseDTO, PrescriptionItemResponseDTO
+from src.messaging.rabbitmq_producer import RabbitMQProducer
 
 class DispenseService:
     def __init__(self, db: Session):
@@ -159,6 +159,20 @@ class DispenseService:
 
         # ❹ Commit một lần để đảm bảo tất cả thay đổi (trừ kho + completed + status đơn)
         self.repo.commit()
+
+        try:
+            producer = RabbitMQProducer()
+            producer.publish({
+                "event": "prescription_ready",
+                "prescription_id": str(dispense.prescription_id),
+                "dispense_id": str(dispense.dispense_id),
+                "patient_id": str(pres.patient_id),
+                "status": "READY"
+            })
+            producer.close()
+        except Exception as e:
+            # log thôi, không break flow chính
+            print(f"⚠️ RabbitMQ publish failed: {e}")
 
         final_lines = self.repo.get_lines_by_dispense(dispense.dispense_id)
         return self._to_dispense_response(completed, final_lines)
