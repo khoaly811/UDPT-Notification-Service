@@ -1,12 +1,11 @@
 from pydantic import BaseModel, Field
 from typing import List, Optional
 from datetime import datetime
-from uuid import UUID
 from decimal import Decimal
 
 # ---------- Request DTOs ----------
 class PrescriptionItemCreateDTO(BaseModel):
-    medication_id: UUID
+    medication_id: int
     quantity_prescribed: Decimal
     unit_prescribed: Optional[str] = None
     dose: Optional[str] = None
@@ -15,8 +14,7 @@ class PrescriptionItemCreateDTO(BaseModel):
     notes: Optional[str] = None
 
 class PrescriptionCreateDTO(BaseModel):
-    patient_id: UUID
-    doctor_id: UUID
+    appointment_id: int
     valid_from: datetime
     valid_to: Optional[datetime] = None
     notes: Optional[str] = None
@@ -30,7 +28,7 @@ class PrescriptionUpdateDTO(BaseModel):
 
 # Dùng cho endpoint thêm 1 thuốc vào đơn (có thể tái dùng PrescriptionItemCreateDTO)
 class PrescriptionItemAddDTO(BaseModel):
-    medication_id: UUID
+    medication_id: int
     quantity_prescribed: Decimal
     unit_prescribed: Optional[str] = None
     dose: Optional[str] = None
@@ -41,12 +39,12 @@ class PrescriptionItemAddDTO(BaseModel):
 # Hủy đơn
 class CancelPrescriptionDTO(BaseModel):
     reason: str
-    canceled_by: UUID
+    canceled_by: int
 
 # ---------- Response DTOs ----------
 class PrescriptionItemResponseDTO(BaseModel):
-    item_id: UUID
-    medication_id: UUID
+    id: int
+    medication_id: int
     quantity_prescribed: Decimal
     unit_prescribed: Optional[str]
     dose: Optional[str]
@@ -60,10 +58,9 @@ class PrescriptionItemResponseDTO(BaseModel):
         from_attributes = True
 
 class PrescriptionResponseDTO(BaseModel):
-    prescription_id: UUID
+    id: int
     prescription_code: Optional[str]
-    patient_id: UUID
-    doctor_id: UUID
+    appointment_id: int
     status: str                        # <-- thêm trường này
     valid_from: datetime
     valid_to: Optional[datetime]
@@ -76,10 +73,9 @@ class PrescriptionResponseDTO(BaseModel):
         from_attributes = True
 
 class PrescriptionListItemDTO(BaseModel):
-    prescription_id: UUID
+    id: int
     prescription_code: Optional[str]
-    patient_id: UUID
-    doctor_id: UUID
+    appointment_id: int
     status: str
     valid_from: datetime
     valid_to: Optional[datetime]

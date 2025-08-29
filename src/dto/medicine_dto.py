@@ -1,5 +1,4 @@
 from pydantic import BaseModel, Field
-from uuid import UUID
 from typing import Optional
 from datetime import datetime
 from decimal import Decimal
@@ -32,7 +31,7 @@ class MedicineUpdateDTO(BaseModel):
 
 # ---------------- LIST ITEM DTO ----------------
 class MedicineListItemDTO(BaseModel):
-    medication_id: UUID
+    id: int
     medicine_name: str
     generic_name: Optional[str]
     form: Optional[str]
@@ -47,7 +46,7 @@ class MedicineListItemDTO(BaseModel):
 
 # ---------------- RESPONSE DTO ----------------
 class MedicineResponseDTO(BaseModel):
-    medication_id: UUID
+    id: int
     atc_code: Optional[str]
     medicine_name: str
     generic_name: Optional[str]

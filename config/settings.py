@@ -44,8 +44,8 @@ class RabbitMQConfig(BaseModel):
     """RabbitMQ configuration settings"""
     host: str = Field(default="rabbitmq")
     port: int = Field(default=5672, ge=1, le=65535)
-    user: str = Field(default="guest")
-    password: str = Field(default="guest")
+    user: str = Field(default="admin")
+    password: str = Field(default="admin")
     exchange: str = Field(default="prescription_exchange")
     queue: str = Field(default="prescription_notifications")
     routing_key: str = Field(default="prescription.ready")
@@ -107,8 +107,8 @@ def get_settings() -> Settings:
         rabbitmq=RabbitMQConfig(
             host=os.getenv("RABBITMQ__HOST", "rabbitmq"),
             port=int(os.getenv("RABBITMQ__PORT", "5672")),
-            user=os.getenv("RABBITMQ__USER", "guest"),
-            password=os.getenv("RABBITMQ__PASSWORD", "guest"),
+            user=os.getenv("RABBITMQ__USER", "admin"),
+            password=os.getenv("RABBITMQ__PASSWORD", "admin"),
             exchange=os.getenv("RABBITMQ__EXCHANGE", "prescription_exchange"),
             queue=os.getenv("RABBITMQ__QUEUE", "prescription_notifications"),
             routing_key=os.getenv("RABBITMQ__ROUTING_KEY", "prescription.ready"),
