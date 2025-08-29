@@ -1,4 +1,3 @@
-from uuid import UUID
 from decimal import Decimal
 from typing import List
 
@@ -36,7 +35,7 @@ class DispenseService:
         return self._to_dispense_response(created, [])
 
     # 2) Thêm dòng cấp phát vào phiếu PENDING
-    def add_line(self, dispense_id: UUID, dto: DispenseLineCreateDTO) -> DispenseResponseDTO:
+    def add_line(self, dispense_id: int, dto: DispenseLineCreateDTO) -> DispenseResponseDTO:
         dispense = self.repo.get_dispense(dispense_id)
         if not dispense:
             raise HTTPException(status_code=404, detail="Dispense not found")
@@ -129,7 +128,7 @@ class DispenseService:
     #     lines = self.repo.get_lines_by_dispense(dispense.dispense_id)
     #     return self._to_dispense_response(dispense, lines)
     # 3) Hoàn tất phiếu (COMPLETED) và cập nhật prescription nếu đã phát đủ
-    def complete(self, dispense_id: UUID, dto: DispenseCompleteDTO) -> DispenseResponseDTO:
+    def complete(self, dispense_id: int, dto: DispenseCompleteDTO) -> DispenseResponseDTO:
         dispense = self.repo.get_dispense(dispense_id)
         if not dispense:
             raise HTTPException(status_code=404, detail="Dispense not found")
@@ -179,7 +178,7 @@ class DispenseService:
 
 
     # 4) Detail
-    def get_dispense(self, dispense_id: UUID) -> DispenseResponseDTO:
+    def get_dispense(self, dispense_id: int) -> DispenseResponseDTO:
         dispense = self.repo.get_dispense(dispense_id)
         if not dispense:
             raise HTTPException(status_code=404, detail="Dispense not found")
@@ -197,7 +196,7 @@ class DispenseService:
     #
     #     return self.complete(dispense.dispense_id, dto)
     # ---- Helpers ----
-    def _is_prescription_fully_dispensed(self, prescription_id: UUID) -> bool:
+    def _is_prescription_fully_dispensed(self, prescription_id: int) -> bool:
         items = self.prescription_repo.get_prescription_items(prescription_id)
         if not items:
             return False
@@ -207,7 +206,7 @@ class DispenseService:
                 return False
         return True
 
-    def _is_prescription_partially_dispensed(self, prescription_id: UUID) -> bool:
+    def _is_prescription_partially_dispensed(self, prescription_id: int) -> bool:
         items=self.prescription_repo.get_prescription_items(prescription_id)
         if not items:
             return False

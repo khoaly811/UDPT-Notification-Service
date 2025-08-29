@@ -4,7 +4,7 @@ CREATE EXTENSION IF NOT EXISTS pgcrypto;-- dùng gen_random_uuid()
 
 
 CREATE TABLE IF NOT EXISTS medication.medicine (
-      id         SERIAL PRIMARY KEY,
+      medication_id         SERIAL PRIMARY KEY,
       atc_code              TEXT,                     -- mã ATC (nếu áp dụng)
       medicine_name                  TEXT NOT NULL,            -- tên thương mại hoặc tên hiển thị
       generic_name          TEXT,                     -- tên hoạt chất
@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS medication.medicine (
 );
 
 CREATE TABLE IF NOT EXISTS medication.prescription (
-      id       SERIAL PRIMARY KEY,
+      prescription_id       SERIAL PRIMARY KEY,
       prescription_code                  TEXT UNIQUE,                -- mã đơn (nếu cần tra cứu nhanh)
       appointment_id INTEGER NOT NULL REFERENCES appointment_mgmt.appointments(id),
       status TEXT NOT NULL DEFAULT 'CREATED'
@@ -39,9 +39,9 @@ CREATE TABLE IF NOT EXISTS medication.prescription (
 );
 
 CREATE TABLE IF NOT EXISTS medication.prescription_item (
-      id               SERIAL PRIMARY KEY,
-      prescription_id       INTEGER NOT NULL REFERENCES medication.prescription(id),
-      medication_id         INTEGER NOT NULL REFERENCES medication.medicine(id),
+      item_id               SERIAL PRIMARY KEY,
+      prescription_id       INTEGER NOT NULL REFERENCES medication.prescription(prescription_id),
+      medication_id         INTEGER NOT NULL REFERENCES medication.medicine(medication_id),
       quantity_prescribed   NUMERIC(14,3) NOT NULL CHECK (quantity_prescribed > 0),
       unit_prescribed                 TEXT,                       -- đơn vị phát (viên, ống, ml…)
       dose                  TEXT,                       -- liều (e.g., 1 viên)
@@ -54,8 +54,8 @@ CREATE TABLE IF NOT EXISTS medication.prescription_item (
 
 -- 5) Dispense (phiếu cấp phát)
 CREATE TABLE IF NOT EXISTS medication.dispense (
-      id           SERIAL PRIMARY KEY,
-      prescription_id       INTEGER NOT NULL REFERENCES medication.prescription(id),
+      dispense_id           SERIAL PRIMARY KEY,
+      prescription_id       INTEGER NOT NULL REFERENCES medication.prescription(prescription_id),
       status TEXT NOT NULL DEFAULT 'PENDING'
            CHECK (status IN ('PENDING','COMPLETED')),
       dispensed_at          TIMESTAMP,               -- thời điểm hoàn tất (COMPLETED)
@@ -64,9 +64,9 @@ CREATE TABLE IF NOT EXISTS medication.dispense (
 );
 
 CREATE TABLE IF NOT EXISTS medication.dispense_line (
-      id               SERIAL PRIMARY KEY,
-      dispense_id           INTEGER NOT NULL REFERENCES medication.dispense(id),
-      prescription_item_id  INTEGER NOT NULL REFERENCES medication.prescription_item(id),
+      line_id               SERIAL PRIMARY KEY,
+      dispense_id           INTEGER NOT NULL REFERENCES medication.dispense(dispense_id),
+      prescription_item_id  INTEGER NOT NULL REFERENCES medication.prescription_item(item_id),
       quantity_dispensed    NUMERIC(14,3) NOT NULL CHECK (quantity_dispensed > 0),
       notes                 TEXT,
       created_at            TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL

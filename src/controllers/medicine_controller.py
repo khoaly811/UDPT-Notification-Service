@@ -1,7 +1,5 @@
 from fastapi import APIRouter, Depends, status, Path, Query
 from sqlalchemy.orm import Session
-from uuid import UUID
-
 from src.services.medicine_service import MedicineService
 from src.dto.pagination_dto import PaginationRequestDTO, PaginatedResponseDTO
 from src.dto.medicine_dto import (
@@ -48,7 +46,7 @@ async def create_medicine(
     description="Retrieve detailed information of a specific medicine by its UUID"
 )
 async def get_medicine_by_id(
-    medicine_id: UUID = Path(..., description="Medicine unique ID"),
+    medicine_id: int = Path(..., description="Medicine unique ID"),
     service: MedicineService = Depends(get_medicine_service)
 ):
     return service.get_medicine_by_id(medicine_id)
@@ -80,7 +78,7 @@ async def list_medicines(
     description="Update selected fields of a medicine by its UUID"
 )
 async def update_medicine(
-    medicine_id: UUID = Path(..., description="Medicine unique ID"),
+    medicine_id: int = Path(..., description="Medicine unique ID"),
     payload: MedicineUpdateDTO = ...,
     service: MedicineService = Depends(get_medicine_service)
 ):
@@ -96,7 +94,7 @@ async def update_medicine(
     description="Soft-delete (deactivate) a medicine by setting `is_active = False`"
 )
 async def delete_medicine(
-    medicine_id: UUID = Path(..., description="Medicine unique ID"),
+    medicine_id: int = Path(..., description="Medicine unique ID"),
     service: MedicineService = Depends(get_medicine_service)
 ):
     return service.delete_medicine(medicine_id)

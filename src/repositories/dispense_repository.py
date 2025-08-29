@@ -1,5 +1,4 @@
 from typing import List, Optional
-from uuid import UUID
 from decimal import Decimal
 from collections import defaultdict
 
@@ -22,7 +21,7 @@ class DispenseRepository:
         self.db.refresh(entity)
         return entity
 
-    def get_dispense(self, dispense_id: UUID) -> Optional[Dispense]:
+    def get_dispense(self, dispense_id: int) -> Optional[Dispense]:
         return (
             self.db.query(Dispense)
             .filter(Dispense.dispense_id == dispense_id)
@@ -35,14 +34,14 @@ class DispenseRepository:
         self.db.refresh(line)
         return line
 
-    def get_lines_by_dispense(self, dispense_id: UUID) -> List[DispenseLine]:
+    def get_lines_by_dispense(self, dispense_id: int) -> List[DispenseLine]:
         return (
             self.db.query(DispenseLine)
             .filter(DispenseLine.dispense_id == dispense_id)
             .all()
         )
 
-    def complete_dispense(self, dispense: Dispense, dispensed_by: UUID) -> Dispense:
+    def complete_dispense(self, dispense: Dispense, dispensed_by: int) -> Dispense:
         dispense.status = "COMPLETED"
         dispense.dispensed_by = dispensed_by
         dispense.dispensed_at = func.now()
@@ -51,7 +50,7 @@ class DispenseRepository:
         return dispense
 
     # -------- Stock --------
-    def bulk_check_and_decrement_stock_for_dispense(self, dispense_id: UUID):
+    def bulk_check_and_decrement_stock_for_dispense(self, dispense_id: int):
         lines = self.get_lines_by_dispense(dispense_id)
         if not lines:
             return
@@ -86,7 +85,7 @@ class DispenseRepository:
             med.stock = Decimal(med.stock or 0) - need_qty
             self.db.add(med)
 
-    def get_pending_dispense_by_prescription(self, prescription_id: UUID) -> Optional[Dispense]:
+    def get_pending_dispense_by_prescription(self, prescription_id: int) -> Optional[Dispense]:
         return (
             self.db.query(Dispense)
             .filter(
@@ -97,7 +96,7 @@ class DispenseRepository:
             .first()
         )
 
-    def create_or_get_pending_dispense(self, prescription_id: UUID, notes: Optional[str] = None) -> Dispense:
+    def create_or_get_pending_dispense(self, prescription_id: int, notes: Optional[str] = None) -> Dispense:
         existing = self.get_pending_dispense_by_prescription(prescription_id)
         if existing:
             return existing
@@ -106,7 +105,7 @@ class DispenseRepository:
         self.db.commit()
         self.db.refresh(entity)
         return entity
-    def get_medicine(self, medication_id: UUID) -> Optional[Medicine]:
+    def get_medicine(self, medication_id: int) -> Optional[Medicine]:
         """
         Lấy thông tin thuốc theo medication_id
         """
@@ -116,7 +115,7 @@ class DispenseRepository:
             .first()
         )
 
-    def sum_completed_dispensed_for_item(self, prescription_item_id: UUID) -> Decimal:
+    def sum_completed_dispensed_for_item(self, prescription_item_id: int) -> Decimal:
         """
         Tổng số lượng đã phát (chỉ tính các phiếu COMPLETED) cho 1 prescription_item.
         """
@@ -131,7 +130,7 @@ class DispenseRepository:
         )
         return Decimal(total or 0)
 
-    def sum_lines_in_dispense_for_item(self, dispense_id: UUID, prescription_item_id: UUID) -> Decimal:
+    def sum_lines_in_dispense_for_item(self, dispense_id: int, prescription_item_id: int) -> Decimal:
         """
         Tổng số lượng của cùng item đã thêm VÀO CHÍNH PHIẾU NÀY (PENDING).
         """

@@ -6,9 +6,9 @@ class Dispense(Base):
     __tablename__ = "dispense"
     __table_args__ = {"schema": "medication"}
 
-    id = Column(Integer, primary_key=True)
+    dispense_id = Column(Integer, primary_key=True)
     prescription_id = Column(Integer,
-                             ForeignKey("medication.prescription.id"),
+                             ForeignKey("medication.prescription.prescription_id"),
                              nullable=False)
 
     status = Column(Text, nullable=False, default="PENDING")  # 'PENDING' | 'COMPLETED'
@@ -17,19 +17,19 @@ class Dispense(Base):
     notes = Column(Text, nullable=True)
 
     def __repr__(self):
-        return f"<Dispense(id={self.id}, prescription_id={self.prescription_id}, status={self.status})>"
+        return f"<Dispense(id={self.dispense_id}, prescription_id={self.prescription_id}, status={self.status})>"
 
 
 class DispenseLine(Base):
     __tablename__ = "dispense_line"
     __table_args__ = {"schema": "medication"}
 
-    id = Column(Integer, primary_key=True)
+    line_id = Column(Integer, primary_key=True)
     dispense_id = Column(Integer,
-                         ForeignKey("medication.dispense.id"),
+                         ForeignKey("medication.dispense.dispense_id"),
                          nullable=False)
     prescription_item_id = Column(Integer,
-                                  ForeignKey("medication.prescription_item.id"),
+                                  ForeignKey("medication.prescription_item.item_id"),
                                   nullable=False)
 
     quantity_dispensed = Column(Numeric(14, 3), nullable=False)
@@ -38,4 +38,4 @@ class DispenseLine(Base):
     created_at = Column(DateTime, nullable=False, server_default=func.now())
 
     def __repr__(self):
-        return f"<DispenseLine(id={self.id}, dispense_id={self.dispense_id}, item_id={self.prescription_item_id})>"
+        return f"<DispenseLine(id={self.line_id}, dispense_id={self.dispense_id}, item_id={self.prescription_item_id})>"

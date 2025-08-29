@@ -1,5 +1,6 @@
 from typing import Optional, List
 
+
 from sqlalchemy.exc import SQLAlchemyError, IntegrityError
 from sqlalchemy.orm import Session
 from sqlalchemy import func
@@ -14,21 +15,21 @@ class PrescriptionRepository:
 
     # -------- Prescription --------
     # -------- Prescription helpers --------
-    def get_prescription(self, prescription_id: UUID) -> Optional[Prescription]:
+    def get_prescription(self, prescription_id: int) -> Optional[Prescription]:
         return (
             self.db.query(Prescription)
             .filter(Prescription.prescription_id == prescription_id)
             .first()
         )
 
-    def get_prescription_item(self, item_id: UUID) -> Optional[PrescriptionItem]:
+    def get_prescription_item(self, item_id: int) -> Optional[PrescriptionItem]:
         return (
             self.db.query(PrescriptionItem)
             .filter(PrescriptionItem.item_id == item_id)
             .first()
         )
 
-    def get_prescription_items(self, prescription_id: UUID) -> List[PrescriptionItem]:
+    def get_prescription_items(self, prescription_id: int) -> List[PrescriptionItem]:
         return (
             self.db.query(PrescriptionItem)
             .filter(PrescriptionItem.prescription_id == prescription_id)
@@ -49,7 +50,7 @@ class PrescriptionRepository:
             .all()
         )
 
-    def get_prescription_by_id(self, prescription_id: UUID) -> Optional[Prescription]:
+    def get_prescription_by_id(self, prescription_id: int) -> Optional[Prescription]:
         """Lấy Prescription theo ID"""
         return (
             self.db.query(Prescription)
@@ -76,7 +77,7 @@ class PrescriptionRepository:
         self.db.refresh(prescription)
         return prescription
 
-    def cancel_prescription(self, prescription: Prescription, reason: str, canceled_by: UUID) -> Prescription:
+    def cancel_prescription(self, prescription: Prescription, reason: str, canceled_by: int) -> Prescription:
         """Hủy Prescription"""
         prescription.status = "CANCELED"
         prescription.canceled_reason = reason
@@ -88,7 +89,7 @@ class PrescriptionRepository:
 
     # -------- PrescriptionItem --------
 
-    def get_items_by_prescription_id(self, prescription_id: UUID) -> List[PrescriptionItem]:
+    def get_items_by_prescription_id(self, prescription_id: int) -> List[PrescriptionItem]:
         """Lấy tất cả item của 1 Prescription"""
         return (
             self.db.query(PrescriptionItem)
@@ -97,7 +98,7 @@ class PrescriptionRepository:
         )
 
 
-    def add_item(self, prescription_id: UUID, item: PrescriptionItem) -> PrescriptionItem:
+    def add_item(self, prescription_id: int, item: PrescriptionItem) -> PrescriptionItem:
         """
         Thêm một item vào Prescription.
         """
@@ -111,7 +112,7 @@ class PrescriptionRepository:
             self.db.rollback()
             raise
 
-    def remove_item_by_id(self, prescription_id: UUID, item_id: UUID) -> int:
+    def remove_item_by_id(self, prescription_id: int, item_id: int) -> int:
         """
         Xóa 1 item thuộc prescription_id. Trả về số dòng bị xóa (0 hoặc 1).
         Dùng delete theo filter để tránh vấn đề session state.

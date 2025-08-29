@@ -7,7 +7,7 @@ class Prescription(Base):
     __tablename__ = "prescription"
     __table_args__ = {"schema": "medication"}
 
-    id = Column(Integer, primary_key=True, index=True)
+    prescription_id = Column(Integer, primary_key=True, index=True)
     prescription_code = Column(Text, unique=True, nullable=True)
 
     appointment_id = Column(Integer, ForeignKey("appointment_mgmt.appointments.id"), nullable=False)
@@ -30,7 +30,7 @@ class Prescription(Base):
     canceled_reason = Column(Text, nullable=True)
 
     def __repr__(self):
-        return f"<Prescription(id={self.id}, appointment={self.appointment_id})>"
+        return f"<Prescription(id={self.prescription_id}, appointment={self.appointment_id})>"
 
 
 # PrescriptionItem (Chi tiết đơn thuốc)
@@ -38,12 +38,12 @@ class PrescriptionItem(Base):
     __tablename__ = "prescription_item"
     __table_args__ = {"schema": "medication"}
 
-    id = Column(Integer, primary_key=True)
+    item_id = Column(Integer, primary_key=True)
     prescription_id = Column(Integer,
-                             ForeignKey("medication.prescription.id"),
+                             ForeignKey("medication.prescription.prescription_id"),
                              nullable=False)
     medication_id = Column(Integer,
-                         ForeignKey("medication.medicine.id"),
+                         ForeignKey("medication.medicine.medication_id"),
                          nullable=False)
 
     quantity_prescribed = Column(Numeric(14, 3), nullable=False)
@@ -57,4 +57,4 @@ class PrescriptionItem(Base):
     updated_at = Column(DateTime, nullable=False, server_default=func.now(), onupdate=func.now())
 
     def __repr__(self):
-        return f"<PrescriptionItem(id={self.id}, prescription_id={self.prescription_id}, medication_id={self.medication_id})>"
+        return f"<PrescriptionItem(id={self.item_id}, prescription_id={self.prescription_id}, medication_id={self.medication_id})>"

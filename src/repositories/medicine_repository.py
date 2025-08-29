@@ -1,5 +1,4 @@
 from typing import Optional, List
-from uuid import UUID
 
 from sqlalchemy.exc import SQLAlchemyError, IntegrityError
 from sqlalchemy.orm import Session
@@ -24,7 +23,7 @@ class MedicineRepository:
             .all()
         )
 
-    def get_medicine_by_id(self, medicine_id: UUID) -> Optional[Medicine]:
+    def get_medicine_by_id(self, medicine_id: int) -> Optional[Medicine]:
         """Lấy Medicine theo ID"""
         return (
             self.db.query(Medicine)

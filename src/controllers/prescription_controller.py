@@ -1,6 +1,5 @@
 from fastapi import APIRouter, Depends, status, Path, Query, Body
 from sqlalchemy.orm import Session
-from uuid import UUID
 
 from src.services.prescription_service import PrescriptionService
 from src.dto.pagination_dto import PaginationRequestDTO, PaginatedResponseDTO
@@ -45,7 +44,7 @@ async def create_prescription(
     description="Retrieve detailed information of a specific prescription including items"
 )
 async def get_prescription_by_id(
-    prescription_id: UUID = Path(..., description="Prescription ID"),
+    prescription_id: int = Path(..., description="Prescription ID"),
     service: PrescriptionService = Depends(get_prescription_service)
 ):
     return service.get_prescription_by_id(prescription_id)
@@ -74,7 +73,7 @@ async def list_prescriptions(
     summary="Update a prescription (notes/valid_from/valid_to)"
 )
 async def update_prescription(
-    prescription_id: UUID,
+    prescription_id: int,
     data: PrescriptionUpdateDTO,
     service: PrescriptionService = Depends(get_prescription_service)
 ):
@@ -87,7 +86,7 @@ async def update_prescription(
     summary="Add one item to a prescription"
 )
 async def add_item_to_prescription(
-    prescription_id: UUID,
+    prescription_id: int,
     item: PrescriptionItemAddDTO,
     service: PrescriptionService = Depends(get_prescription_service)
 ):
@@ -102,8 +101,8 @@ async def add_item_to_prescription(
     summary="Remove one item from a prescription"
 )
 async def remove_item_from_prescription(
-    prescription_id: UUID,
-    item_id: UUID,
+    prescription_id: int,
+    item_id: int,
     service: PrescriptionService = Depends(get_prescription_service)
 ):
     return service.remove_item(prescription_id, item_id)
@@ -117,7 +116,7 @@ async def remove_item_from_prescription(
     summary="Cancel a prescription"
 )
 async def cancel_prescription(
-    prescription_id: UUID,
+    prescription_id: int,
     payload: CancelPrescriptionDTO = Body(..., description="Cancel reason and user"),
     service: PrescriptionService = Depends(get_prescription_service)
 ):

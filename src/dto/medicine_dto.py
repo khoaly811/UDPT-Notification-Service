@@ -1,4 +1,5 @@
 from pydantic import BaseModel, Field
+
 from typing import Optional
 from datetime import datetime
 from decimal import Decimal
@@ -31,7 +32,7 @@ class MedicineUpdateDTO(BaseModel):
 
 # ---------------- LIST ITEM DTO ----------------
 class MedicineListItemDTO(BaseModel):
-    id: int
+    medication_id: int
     medicine_name: str
     generic_name: Optional[str]
     form: Optional[str]
@@ -46,7 +47,7 @@ class MedicineListItemDTO(BaseModel):
 
 # ---------------- RESPONSE DTO ----------------
 class MedicineResponseDTO(BaseModel):
-    id: int
+    medication_id: int
     atc_code: Optional[str]
     medicine_name: str
     generic_name: Optional[str]

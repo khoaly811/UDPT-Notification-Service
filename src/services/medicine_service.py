@@ -1,7 +1,5 @@
 from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
-from uuid import UUID
-
 from src.repositories.medicine_repository import MedicineRepository
 from src.models.medicine import Medicine
 from src.dto.pagination_dto import PaginatedResponseDTO, PaginationRequestDTO
@@ -38,7 +36,7 @@ class MedicineService:
         return self._to_response(created)
 
     # ---------------- DETAIL ----------------
-    def get_medicine_by_id(self, medicine_id: UUID) -> MedicineResponseDTO:
+    def get_medicine_by_id(self, medicine_id: int) -> MedicineResponseDTO:
         medicine = self.repository.get_medicine_by_id(medicine_id)
         if not medicine:
             raise HTTPException(
@@ -61,7 +59,7 @@ class MedicineService:
         )
 
     # ---------------- UPDATE ----------------
-    def update_medicine(self, medicine_id: UUID, data: MedicineUpdateDTO) -> MedicineResponseDTO:
+    def update_medicine(self, medicine_id: int, data: MedicineUpdateDTO) -> MedicineResponseDTO:
         medicine = self.repository.get_medicine_by_id(medicine_id)
         if not medicine:
             raise HTTPException(status_code=404, detail="Medicine not found")
@@ -87,7 +85,7 @@ class MedicineService:
         return self._to_response(updated)
 
     # ---------------- DELETE / DEACTIVATE ----------------
-    def delete_medicine(self, medicine_id: UUID) -> MedicineResponseDTO:
+    def delete_medicine(self, medicine_id: int) -> MedicineResponseDTO:
         medicine = self.repository.get_medicine_by_id(medicine_id)
         if not medicine:
             raise HTTPException(status_code=404, detail="Medicine not found")

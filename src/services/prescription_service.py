@@ -1,8 +1,6 @@
 from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
 from typing import List
-from uuid import UUID
-
 from src.repositories.prescription_repository import PrescriptionRepository
 from src.models.prescription import Prescription
 from src.models.prescription import PrescriptionItem
@@ -74,7 +72,7 @@ class PrescriptionService:
         created = self.repository.create_prescription(prescription, items)
         return self._to_response(created)
 
-    def get_prescription_by_id(self, prescription_id: UUID) -> PrescriptionResponseDTO:
+    def get_prescription_by_id(self, prescription_id: int) -> PrescriptionResponseDTO:
         prescription = self.repository.get_prescription_by_id(prescription_id)
         if not prescription:
             raise HTTPException(
@@ -95,7 +93,7 @@ class PrescriptionService:
             total=total
         )
 
-    def update_prescription(self, prescription_id: UUID, data: PrescriptionUpdateDTO) -> PrescriptionResponseDTO:
+    def update_prescription(self, prescription_id: int, data: PrescriptionUpdateDTO) -> PrescriptionResponseDTO:
         prescription = self.repository.get_prescription_by_id(prescription_id)
         if not prescription:
             raise HTTPException(status_code=404, detail="Prescription not found")
@@ -114,7 +112,7 @@ class PrescriptionService:
         updated = self.repository.update_prescription(prescription)
         return self._to_response(updated)
 
-    def add_item(self, prescription_id: UUID, dto: PrescriptionItemAddDTO) -> PrescriptionResponseDTO:
+    def add_item(self, prescription_id: int, dto: PrescriptionItemAddDTO) -> PrescriptionResponseDTO:
         prescription = self.repository.get_prescription_by_id(prescription_id)
         if not prescription:
             raise HTTPException(status_code=404, detail="Prescription not found")
@@ -133,7 +131,7 @@ class PrescriptionService:
         self.repository.add_item(prescription_id, item)
         return self.get_prescription_by_id(prescription_id)
 
-    def remove_item(self, prescription_id: UUID, item_id: UUID) -> PrescriptionResponseDTO:
+    def remove_item(self, prescription_id: int, item_id: int) -> PrescriptionResponseDTO:
         prescription = self.repository.get_prescription_by_id(prescription_id)
         if not prescription:
             raise HTTPException(status_code=404, detail="Prescription not found")
@@ -162,7 +160,7 @@ class PrescriptionService:
         # trả lại chi tiết đơn sau khi xóa
         return self.get_prescription_by_id(prescription_id)
 
-    def cancel_prescription(self, prescription_id: UUID, data: CancelPrescriptionDTO) -> PrescriptionResponseDTO:
+    def cancel_prescription(self, prescription_id: int, data: CancelPrescriptionDTO) -> PrescriptionResponseDTO:
         prescription = self.repository.get_prescription_by_id(prescription_id)
         if not prescription:
             raise HTTPException(status_code=404, detail="Prescription not found")

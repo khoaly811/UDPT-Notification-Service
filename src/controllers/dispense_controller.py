@@ -1,6 +1,5 @@
 from fastapi import APIRouter, Depends, status, Path
 from sqlalchemy.orm import Session
-from uuid import UUID
 
 from config import get_db
 from src.services.dispense_service import DispenseService
@@ -27,7 +26,7 @@ async def create_dispense(dto: DispenseCreateDTO, service: DispenseService = Dep
     status_code=status.HTTP_200_OK,
     summary="Add a line to a PENDING dispense"
 )
-async def add_line(dispense_id: UUID, dto: DispenseLineCreateDTO, service: DispenseService = Depends(get_service)):
+async def add_line(dispense_id: int, dto: DispenseLineCreateDTO, service: DispenseService = Depends(get_service)):
     return service.add_line(dispense_id, dto)
 
 @dispense_router.post(
@@ -35,7 +34,7 @@ async def add_line(dispense_id: UUID, dto: DispenseLineCreateDTO, service: Dispe
     status_code=status.HTTP_200_OK,
     summary="Complete a PENDING dispense"
 )
-async def complete_dispense(dispense_id: UUID, dto: DispenseCompleteDTO, service: DispenseService = Depends(get_service)):
+async def complete_dispense(dispense_id: int, dto: DispenseCompleteDTO, service: DispenseService = Depends(get_service)):
     return service.complete(dispense_id, dto)
 
 @dispense_router.get(
@@ -43,7 +42,7 @@ async def complete_dispense(dispense_id: UUID, dto: DispenseCompleteDTO, service
     status_code=status.HTTP_200_OK,
     summary="Get dispense detail"
 )
-async def get_dispense(dispense_id: UUID, service: DispenseService = Depends(get_service)):
+async def get_dispense(dispense_id: int, service: DispenseService = Depends(get_service)):
     return service.get_dispense(dispense_id)
 # @dispense_router.post(
 #     "/by-prescription/{prescription_id}/lines",

@@ -14,7 +14,8 @@ class PrescriptionItemCreateDTO(BaseModel):
     notes: Optional[str] = None
 
 class PrescriptionCreateDTO(BaseModel):
-    appointment_id: int
+    patient_id: int
+    doctor_id: int
     valid_from: datetime
     valid_to: Optional[datetime] = None
     notes: Optional[str] = None
@@ -43,7 +44,7 @@ class CancelPrescriptionDTO(BaseModel):
 
 # ---------- Response DTOs ----------
 class PrescriptionItemResponseDTO(BaseModel):
-    id: int
+    item_id: int
     medication_id: int
     quantity_prescribed: Decimal
     unit_prescribed: Optional[str]
@@ -58,9 +59,10 @@ class PrescriptionItemResponseDTO(BaseModel):
         from_attributes = True
 
 class PrescriptionResponseDTO(BaseModel):
-    id: int
+    prescription_id: int
     prescription_code: Optional[str]
-    appointment_id: int
+    patient_id: int
+    doctor_id: int
     status: str                        # <-- thêm trường này
     valid_from: datetime
     valid_to: Optional[datetime]
@@ -73,9 +75,10 @@ class PrescriptionResponseDTO(BaseModel):
         from_attributes = True
 
 class PrescriptionListItemDTO(BaseModel):
-    id: int
+    prescription_id: int
     prescription_code: Optional[str]
-    appointment_id: int
+    patient_id: int
+    doctor_id: int
     status: str
     valid_from: datetime
     valid_to: Optional[datetime]

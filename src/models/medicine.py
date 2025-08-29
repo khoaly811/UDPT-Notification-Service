@@ -8,7 +8,7 @@ class Medicine(Base):
     __tablename__ = "medicine"
     __table_args__ = {"schema": "medication"}
 
-    id = Column(Integer, primary_key=True, index=True)
+    medication_id = Column(Integer, primary_key=True, index=True)
 
     atc_code = Column(String, nullable=True)          # mã ATC
     medicine_name = Column(Text, nullable=False)      # tên thuốc
@@ -23,4 +23,4 @@ class Medicine(Base):
     updated_at = Column(DateTime, nullable=False, server_default=func.now(), onupdate=func.now())
 
     def __repr__(self):
-        return f"<Medicine(id={self.id}, name={self.medicine_name})>"
+        return f"<Medicine(id={self.medication_id}, name={self.medicine_name})>"
