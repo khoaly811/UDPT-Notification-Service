@@ -27,7 +27,7 @@ def get_prescription_service(db: Session = Depends(get_db)) -> PrescriptionServi
     response_model=PrescriptionResponseDTO,
     status_code=status.HTTP_201_CREATED,
     summary="Create new prescription",
-    description="Create a new prescription with its items"
+    description="Create a new prescription with items"
 )
 async def create_prescription(
     data: PrescriptionCreateDTO,

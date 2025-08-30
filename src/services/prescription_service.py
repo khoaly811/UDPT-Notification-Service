@@ -1,5 +1,6 @@
 from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
+import httpx
 from typing import List
 from src.repositories.prescription_repository import PrescriptionRepository
 from src.models.prescription import Prescription, PrescriptionItem
@@ -14,11 +15,22 @@ from src.dto.prescription_dto import (
     CancelPrescriptionDTO,
 )
 
-
+APPOINTMENT_SERVICE_URL = "http://localhost:8005"
 class PrescriptionService:
     def __init__(self, db: Session):
         self.repository = PrescriptionRepository(db)
 
+    def _validate_appointment_exists(self, appointment_id: int):
+        try:
+            url = f"{APPOINTMENT_SERVICE_URL}/appointments/{appointment_id}"
+            resp = httpx.get(url, timeout=5.0)
+
+            if resp.status_code == 404:
+                raise HTTPException(status_code=404, detail="Appointment not found")
+            if resp.status_code != 200:
+                raise HTTPException(status_code=502, detail="Appointment service error")
+        except Exception as e:
+            raise HTTPException(status_code=502, detail=f"Error contacting Appointment service: {e}")
     # ---------------- Helpers ----------------
     def _to_response(self, prescription: Prescription) -> PrescriptionResponseDTO:
         items_in_db = self.repository.get_items_by_prescription_id(prescription.prescription_id)
@@ -42,6 +54,8 @@ class PrescriptionService:
         )
 
     def create_prescription(self, data: PrescriptionCreateDTO) -> PrescriptionResponseDTO:
+        self._validate_appointment_exists(data.appointment_id)
+
         if not data.items or len(data.items) == 0:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
