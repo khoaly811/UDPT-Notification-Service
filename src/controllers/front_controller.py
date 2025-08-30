@@ -2,7 +2,6 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from src.controllers.user_controller import user_router
 from src.controllers.prescription_controller import prescription_router
 from src.controllers.dispense_controller import dispense_router
 from src.controllers.medicine_controller import medicine_router
@@ -68,7 +67,6 @@ app.add_middleware(
 )
 
 # Include routers
-app.include_router(user_router)
 app.include_router(prescription_router)
 app.include_router(dispense_router)
 app.include_router(medicine_router) 

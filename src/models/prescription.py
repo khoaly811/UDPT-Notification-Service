@@ -20,13 +20,13 @@ class Prescription(Base):
     notes = Column(Text, nullable=True)
 
     created_at = Column(DateTime, nullable=False, server_default=func.now())
-    created_by = Column(Integer, nullable=True)
+    created_by = Column(Integer,ForeignKey("appointment_mgmt.doctors.id"), nullable=True)
 
     updated_at = Column(DateTime, nullable=False, server_default=func.now(), onupdate=func.now())
-    updated_by = Column(Integer, nullable=True)
+    updated_by = Column(Integer,ForeignKey("appointment_mgmt.doctors.id"), nullable=True)
 
     canceled_at = Column(DateTime, nullable=True)
-    canceled_by = Column(Integer, nullable=True)
+    canceled_by = Column(Integer,ForeignKey("appointment_mgmt.doctors.id"), nullable=True)
     canceled_reason = Column(Text, nullable=True)
 
     def __repr__(self):

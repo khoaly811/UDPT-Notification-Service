@@ -92,7 +92,7 @@ class DispenseRepository:
                 Dispense.prescription_id == prescription_id,
                 Dispense.status == "PENDING"
             )
-            .order_by(Dispense.created_at.desc())
+            .order_by(Dispense.dispense_id.desc())
             .first()
         )
 

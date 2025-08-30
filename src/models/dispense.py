@@ -13,7 +13,7 @@ class Dispense(Base):
 
     status = Column(Text, nullable=False, default="PENDING")  # 'PENDING' | 'COMPLETED'
     dispensed_at = Column(DateTime, nullable=True)
-    dispensed_by = Column(Integer, nullable=True)
+    dispensed_by = Column(Integer,ForeignKey("appointment_mgmt.doctors.id"), nullable=True)
     notes = Column(Text, nullable=True)
 
     def __repr__(self):

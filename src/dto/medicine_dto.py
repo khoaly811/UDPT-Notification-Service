@@ -1,5 +1,4 @@
 from pydantic import BaseModel, Field
-
 from typing import Optional
 from datetime import datetime
 from decimal import Decimal
@@ -40,7 +39,8 @@ class MedicineListItemDTO(BaseModel):
     unit: Optional[str]
     stock: Decimal
     is_active: bool
-    expiry_date: datetime
+    expiry_date: Optional[datetime]
+
     class Config:
         from_attributes = True  # cho SQLAlchemy ORM
 
@@ -56,7 +56,7 @@ class MedicineResponseDTO(BaseModel):
     unit: Optional[str]
     stock: Decimal
     is_active: bool
-    expiry_date: datetime
+    expiry_date: Optional[datetime]
     created_at: datetime
     updated_at: datetime
 

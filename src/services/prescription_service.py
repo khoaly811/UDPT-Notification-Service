@@ -2,8 +2,7 @@ from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
 from typing import List
 from src.repositories.prescription_repository import PrescriptionRepository
-from src.models.prescription import Prescription
-from src.models.prescription import PrescriptionItem
+from src.models.prescription import Prescription, PrescriptionItem
 from src.dto.pagination_dto import PaginatedResponseDTO, PaginationRequestDTO
 from src.dto.prescription_dto import (
     PrescriptionCreateDTO,
@@ -11,8 +10,8 @@ from src.dto.prescription_dto import (
     PrescriptionItemResponseDTO,
     PrescriptionListItemDTO,
     PrescriptionUpdateDTO,
-    PrescriptionItemAddDTO,     # bạn đã xác nhận DTO ok
-    CancelPrescriptionDTO,      # bạn đã xác nhận DTO ok
+    PrescriptionItemAddDTO,
+    CancelPrescriptionDTO,
 )
 
 
@@ -20,42 +19,44 @@ class PrescriptionService:
     def __init__(self, db: Session):
         self.repository = PrescriptionRepository(db)
 
-        # ---------------- Helpers ----------------
+    # ---------------- Helpers ----------------
     def _to_response(self, prescription: Prescription) -> PrescriptionResponseDTO:
         items_in_db = self.repository.get_items_by_prescription_id(prescription.prescription_id)
         item_dtos = [PrescriptionItemResponseDTO.model_validate(it) for it in items_in_db]
         return PrescriptionResponseDTO(
             prescription_id=prescription.prescription_id,
             prescription_code=prescription.prescription_code,
-            patient_id=prescription.patient_id,
-            doctor_id=prescription.doctor_id,
+            appointment_id=prescription.appointment_id,
             status=prescription.status,
             valid_from=prescription.valid_from,
             valid_to=prescription.valid_to,
             notes=prescription.notes,
             created_at=prescription.created_at,
+            created_by=prescription.created_by,
             updated_at=prescription.updated_at,
+            updated_by=prescription.updated_by,
+            canceled_at=prescription.canceled_at,
+            canceled_by=prescription.canceled_by,
+            canceled_reason=prescription.canceled_reason,
             items=item_dtos
         )
+
     def create_prescription(self, data: PrescriptionCreateDTO) -> PrescriptionResponseDTO:
-        """Tạo mới một đơn thuốc cùng các item"""
         if not data.items or len(data.items) == 0:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Prescription must have at least one item"
             )
 
-        # Tạo prescription entity
         prescription = Prescription(
-            patient_id=data.patient_id,
-            doctor_id=data.doctor_id,
+            appointment_id=data.appointment_id,
             valid_from=data.valid_from,
             valid_to=data.valid_to,
             notes=data.notes,
+            created_by=data.created_by,
             status="CREATED",
         )
 
-        # Tạo các prescription item
         items = [
             PrescriptionItem(
                 medication_id=item.medication_id,
@@ -68,7 +69,7 @@ class PrescriptionService:
             )
             for item in data.items
         ]
-        # Lưu vào DB
+
         created = self.repository.create_prescription(prescription, items)
         return self._to_response(created)
 
@@ -100,13 +101,14 @@ class PrescriptionService:
         if prescription.status == "CANCELED":
             raise HTTPException(status_code=400, detail="Cannot edit a canceled prescription")
 
-        # Mutate các field cho phép
         if data.valid_from is not None:
             prescription.valid_from = data.valid_from
         if data.valid_to is not None:
             prescription.valid_to = data.valid_to
         if data.notes is not None:
             prescription.notes = data.notes
+        if data.updated_by is not None:
+            prescription.updated_by = data.updated_by
 
         prescription.status = "UPDATED"
         updated = self.repository.update_prescription(prescription)
@@ -138,26 +140,18 @@ class PrescriptionService:
         if prescription.status == "CANCELED":
             raise HTTPException(status_code=400, detail="Cannot remove item from a canceled prescription")
 
-        # kiểm tra tồn tại (để trả 404 đúng nghĩa)
-        item = self.repository.get_item_by_id(item_id)
+        # kiểm tra tồn tại
+        item = self.repository.get_prescription_item(item_id)
         if not item or item.prescription_id != prescription_id:
             raise HTTPException(status_code=404, detail="Prescription item not found")
 
-        try:
-            deleted = self.repository.remove_item_by_id(prescription_id, item_id)
-        except IntegrityError as e:
-            # Trường hợp dính ràng buộc (ví dụ sau này có dispense_line tham chiếu)
-            raise HTTPException(status_code=400, detail="Cannot remove item due to related records") from e
-
+        deleted = self.repository.remove_item_by_id(prescription_id, item_id)
         if deleted == 0:
-            # Không xóa được vì không match filter
             raise HTTPException(status_code=404, detail="Prescription item not found")
 
-        # Optionally đánh dấu prescription đã cập nhật
         prescription.status = "UPDATED"
         self.repository.update_prescription(prescription)
 
-        # trả lại chi tiết đơn sau khi xóa
         return self.get_prescription_by_id(prescription_id)
 
     def cancel_prescription(self, prescription_id: int, data: CancelPrescriptionDTO) -> PrescriptionResponseDTO:
