@@ -1,6 +1,9 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Body
 from src.services.notification_service import NotificationService
 from src.dto.notification_dto import NotificationResponseDTO, MarkReadDTO
+
+import smtplib
+from email.mime.text import MIMEText
 
 router = APIRouter(prefix="/notifications", tags=["notifications"])
 service = NotificationService()
@@ -27,3 +30,21 @@ def list_notifications(user_id: int):
 def mark_read(dto: MarkReadDTO):
     service.mark_as_read(dto.notification_id)
     return {"status": "ok"}
+
+@router.post("/send-email")
+def send_email(to: str = Body(...), subject: str = Body(...), text: str = Body(...)):
+    sender = "dangkhoaly431@gmail.com"
+    password = "fjpl nyoi fcfa wzjs"
+
+    msg = MIMEText(text)
+    msg["Subject"] = subject
+    msg["From"] = sender
+    msg["To"] = to
+
+    try:
+        with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
+            server.login(sender, password)
+            server.sendmail(sender, [to], msg.as_string())
+        return {"message": "Email sent successfully!"}
+    except Exception as e:
+        return {"error": str(e)}
