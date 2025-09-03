@@ -1,9 +1,9 @@
 from src.services.notification_service import NotificationService
 import requests
+import os
 
 service = NotificationService()
-APPOINTMENT_SERVICE_URL = "http://localhost:8005"
-
+APPOINTMENT_SERVICE_URL = str(os.getenv("APPOINTMENT__SERVICE__ENDPOINT", "http://localhost:8005"))
 def handle_prescription_ready(event: dict):
     data = event["data"]
     prescription_id = data["prescription_id"]

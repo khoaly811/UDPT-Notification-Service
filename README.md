@@ -1,4 +1,4 @@
-# UDPT-Hospital-Management-System-BE
+# UDPT-Hospital-Management-System-Notification-Service
 
 Setup
 
