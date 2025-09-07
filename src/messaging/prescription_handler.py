@@ -1,5 +1,5 @@
 from src.services.notification_service import NotificationService
-import requests
+import httpx
 import os
 
 service = NotificationService()
@@ -14,7 +14,7 @@ def handle_prescription_ready(event: dict):
     # Gọi appointment-service để lấy patient_id
     try:
         url = f"{APPOINTMENT_SERVICE_URL}/appointments/{appointment_id}"
-        resp = requests.get(url, timeout=5.0)
+        resp = httpx.get(url, timeout=5.0)
         if resp.status_code == 200:
             appointment = resp.json()
             patient_id = appointment["patient_id"]
